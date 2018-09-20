@@ -7,20 +7,14 @@
 				<td>[view.showRef;strconv=no]</td>
 			</tr>
 
-			<tr class="label">
-				<td width="25%">[langs.transnoentities(Label)]</td>
-				<td>[view.showLabel;strconv=no]</td>
+			<tr class="lattitude">
+				<td width="25%">[langs.transnoentities(Lattitude)]</td>
+				<td>[view.showLattitude;strconv=no]</td>
 			</tr>
 
-			<tr class="distance">
-				<td width="25%">[langs.transnoentities(Distance)]</td>
-				<td>[view.showDistance;strconv=no]</td>
-			</tr>
-
-
-			<tr class="difficulte">
-				<td width="25%">[langs.transnoentities(Difficulte)]</td>
-				<td>[view.showDifficulte;strconv=no]</td>
+			<tr class="longitude">
+				<td width="25%">[langs.transnoentities(Longitude)]</td>
+				<td>[view.showLongitude;strconv=no]</td>
 			</tr>
 
 			<tr class="status">
@@ -54,14 +48,14 @@
 <div class="tabsAction">
 	[onshow;block=begin;when [user.rights.seedrando.write;noerr]=1]
 	
-		[onshow;block=begin;when [object.status]=[seedrando.STATUS_DRAFT]]
+		[onshow;block=begin;when [object.status]=[wayPoint.STATUS_DRAFT]]
 			
 			<div class="inline-block divButAction"><a href="[view.urlcard]?id=[object.id]&action=validate" class="butAction">[langs.transnoentities(Validate)]</a></div>
 			<div class="inline-block divButAction"><a href="[view.urlcard]?id=[object.id]&action=edit" class="butAction">[langs.transnoentities(Modify)]</a></div>
 			
 		[onshow;block=end]
 		
-		[onshow;block=begin;when [object.status]=[seedrando.STATUS_VALIDATED]]
+		[onshow;block=begin;when [object.status]=[wayPoint.STATUS_VALIDATED]]
 			
 			<div class="inline-block divButAction"><a href="[view.urlcard]?id=[object.id]&action=modif" class="butAction">[langs.transnoentities(Reopen)]</a></div>
 			
@@ -70,7 +64,7 @@
 		<div class="inline-block divButAction"><a href="[view.urlcard]?id=[object.id]&action=clone" class="butAction">[langs.transnoentities(ToClone)]</a></div>
 		
 		<!-- '-+' est l'équivalent d'un signe '<' (TBS oblige) -->
-		[onshow;block=begin;when [object.status]-+[seedrando.STATUS_REFUSED]]
+		[onshow;block=begin;when [object.status]-+[wayPoint.STATUS_REFUSED]]
 			
 			<div class="inline-block divButAction"><a href="[view.urlcard]?id=[object.id]&action=delete" class="butActionDelete">[langs.transnoentities(Delete)]</a></div>
 			

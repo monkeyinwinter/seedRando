@@ -16,7 +16,11 @@ if(!defined('INC_FROM_DOLIBARR')) {
 
 
 dol_include_once('/seedrando/class/seedrando.class.php');
+dol_include_once('/seedrando/class/wayPoint.class.php');
 
 $o=new seedrando($db);
+$o->init_db_by_vars();
+
+$o=new WayPoint($db);
 $o->init_db_by_vars();
 //
