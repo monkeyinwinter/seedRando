@@ -49,6 +49,8 @@ class seedrando extends SeedObject
 		$this->fields=array(
 				'ref'=>array('type'=>'string','length'=>50,'index'=>true)
 				,'label'=>array('type'=>'string')
+				,'distance'=>array('type'=>'string')
+				,'difficulte'=>array('type'=>'string')
 				,'status'=>array('type'=>'integer','index'=>true) // date, integer, string, float, array, text
 				,'entity'=>array('type'=>'integer','index'=>true)
 		);
@@ -233,7 +235,7 @@ class seedrando extends SeedObject
 }
 
 
-/*
+
 class seedrandoDet extends TObjetStd
 {
 	public $table_element = 'seedrandodet';
@@ -253,4 +255,4 @@ class seedrandoDet extends TObjetStd
 	
 	
 }
-*/
+

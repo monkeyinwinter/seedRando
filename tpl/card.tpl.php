@@ -12,6 +12,29 @@
 				<td>[view.showLabel;strconv=no]</td>
 			</tr>
 
+			<tr class="distance">
+				<td width="25%">[langs.transnoentities(Distance)]</td>
+				<td>[view.showDistance;strconv=no]</td>
+			</tr>
+
+
+			<tr class="difficulte">
+				<td width="25%">[langs.transnoentities(Difficulte)]</td>
+				<td>[view.showDifficulte;strconv=no]</td>
+			</tr>
+
+
+<!-- 			<tr class="difficulte"> -->
+<!-- 				<td width="25%">[langs.transnoentities(Difficulte)]</td> -->
+<!-- 				<td> -->
+<!-- 					<select> -->
+<!-- 						<option value="facile">Facile</option> -->
+<!-- 						<option value="moyenne">Moyenne</option> -->
+<!-- 						<option value="difficile">Difficile</option> -->
+<!-- 					</select> -->
+<!-- 				</td> -->
+<!-- 			</tr> -->
+
 			<tr class="status">
 				<td width="25%">[langs.transnoentities(Status)]</td>
 				<td>[object.getLibStatut(1);strconv=no]</td>

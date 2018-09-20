@@ -12,11 +12,11 @@ if(!defined('INC_FROM_DOLIBARR')) {
 }
 
 
-/* uncomment
+// uncomment
 
 
 dol_include_once('/seedrando/class/seedrando.class.php');
 
 $o=new seedrando($db);
 $o->init_db_by_vars();
-*/
+//

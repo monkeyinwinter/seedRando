@@ -37,7 +37,7 @@ llxHeader('',$langs->trans('seedrandoList'),'','');
 //if (empty($user->rights->seedrando->all->read)) $type = 'mine';
 
 // TODO ajouter les champs de son objet que l'on souhaite afficher
-$sql = 'SELECT t.rowid, t.ref, t.label, t.date_creation, t.tms, \'\' AS action';
+$sql = 'SELECT t.rowid, t.ref, t.label, t.distance, t.difficulte, t.date_creation, t.tms, \'\' AS action';
 
 $sql.= ' FROM '.MAIN_DB_PREFIX.'seedrando t ';
 
@@ -67,6 +67,8 @@ echo $r->render($sql, array(
 		,'tms' => array('search_type' => 'calendars', 'allow_is_null' => false)
 		,'ref' => array('search_type' => true, 'table' => 't', 'field' => 'ref')
 		,'label' => array('search_type' => true, 'table' => array('t', 't'), 'field' => array('label')) // input text de recherche sur plusieurs champs
+		,'distance'=> array('search_type' => true, 'table' => array('t', 't'), 'field' => array('distance'))
+		,'difficulte' => array('search_type' => true, 'table' => array('t', 't'), 'field' => array('difficulte'))
 		,'status' => array('search_type' => seedrando::$TStatus, 'to_translate' => true) // select html, la clé = le status de l'objet, 'to_translate' à true si nécessaire
 	)
 	,'translate' => array()
@@ -85,6 +87,8 @@ echo $r->render($sql, array(
 	,'title'=>array(
 		'ref' => $langs->trans('Ref.')
 		,'label' => $langs->trans('Label')
+		,'distance' => $langs->trans('Distance')
+		,'difficulte' => $langs->trans('Difficulte')
 		,'date_creation' => $langs->trans('DateCre')
 		,'tms' => $langs->trans('DateMaj')
 	)

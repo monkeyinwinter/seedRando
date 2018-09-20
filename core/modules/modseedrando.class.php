@@ -182,7 +182,7 @@ class modseedrando extends DolibarrModules
 		// $this->rights[$r][4] = 'level1';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
 		// $this->rights[$r][5] = 'level2';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
 		// $r++;
-/*
+
 		$this->rights[$r][0] = $this->numero . $r;	// Permission id (must not be already used)
 		$this->rights[$r][1] = 'seedrando_read';	// Permission label
 		$this->rights[$r][3] = 1; 					// Permission by default for new user (0/1)
@@ -196,7 +196,7 @@ class modseedrando extends DolibarrModules
 		$this->rights[$r][4] = 'write';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
 		$this->rights[$r][5] = '';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
 		$r++;
-*/
+
 
 		// Main menu entries
 		$this->menu = array();			// List of menus to add
@@ -234,7 +234,7 @@ class modseedrando extends DolibarrModules
 		//							'user'=>2);				                // 0=Menu for internal users, 1=external users, 2=both
 		// $r++;
 		
-/*
+
 		$this->menu[$r]=array(	
 			'fk_menu'=>0,			                // Put 0 if this is a top menu
 			'type'=>'top',			                // This is a Top menu entry
@@ -270,7 +270,7 @@ class modseedrando extends DolibarrModules
 		$this->menu[$r]=array(
 			'fk_menu'=>'fk_mainmenu=seedrando,fk_leftmenu=seedrando_left',		    // Use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'=>'left',			                // This is a Left menu entry
-			'titre'=>$langs->trans('LeftMenuseedrandoCreate'),
+			'titre'=>$langs->trans('Créer une rando'),
 			'mainmenu'=>'seedrando',
 			'leftmenu'=>'seedrando_left_create',
 			'url'=>'/seedrando/card.php?action=create',
@@ -287,7 +287,7 @@ class modseedrando extends DolibarrModules
 		$this->menu[$r]=array(
 			'fk_menu'=>'fk_mainmenu=seedrando,fk_leftmenu=seedrando_left',		    // Use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'=>'left',			                // This is a Left menu entry
-			'titre'=>$langs->trans('LeftMenuseedrandoList'),
+			'titre'=>$langs->trans('Liste des randos'),
 			'mainmenu'=>'seedrando',
 			'leftmenu'=>'seedrando_left_list',
 			'url'=>'/seedrando/list.php',
@@ -299,7 +299,7 @@ class modseedrando extends DolibarrModules
 			'user'=>2
 		);				                // 0=Menu for internal users, 1=external users, 2=both
 		$r++;
-*/
+
 		
 		// Exports
 		$r=1;

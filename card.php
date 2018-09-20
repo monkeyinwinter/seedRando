@@ -3,6 +3,7 @@
 require 'config.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
+
 dol_include_once('/seedrando/class/seedrando.class.php');
 dol_include_once('/seedrando/lib/seedrando.lib.php');
 
@@ -115,6 +116,8 @@ else
 	dol_fiche_head($head, 'card', $langs->trans("seedrando"), 0, $picto);
 }
 
+$selectDifficulte = array('facile'=>'Facile','moyen'=>'Moyen','difficile'=>'Difficile');//drop list select pour la difficulte
+
 $formcore = new TFormCore;
 $formcore->Set_typeaff($mode);
 
@@ -141,6 +144,8 @@ print $TBS->render('tpl/card.tpl.php'
 			,'urllist' => dol_buildpath('/seedrando/list.php', 1)
 			,'showRef' => ($action == 'create') ? $langs->trans('Draft') : $form->showrefnav($object, 'ref', $linkback, 1, 'ref', 'ref', '')
 			,'showLabel' => $formcore->texte('', 'label', $object->label, 80, 255)
+			,'showDistance' => $formcore->texte('', 'distance', $object->distance, 80, 255)
+			,'showDifficulte' => $form->selectarray('difficulte', $selectDifficulte, $object->difficulte)
 //			,'showNote' => $formcore->zonetexte('', 'note', $object->note, 80, 8)
 			,'showStatus' => $object->getLibStatut(1)
 		)
