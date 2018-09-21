@@ -5,6 +5,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/functions.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
 
 dol_include_once('/seedrando/class/seedrando.class.php');
+dol_include_once('/seedrando/class/wayPoint.class.php');
 dol_include_once('/seedrando/lib/seedrando.lib.php');
 
 if(empty($user->rights->seedrando->read)) accessforbidden();
@@ -116,7 +117,29 @@ else
 	dol_fiche_head($head, 'card', $langs->trans("seedrando"), 0, $picto);
 }
 
-$selectDifficulte = array('facile'=>'Facile','moyen'=>'Moyen','difficile'=>'Difficile');//drop list select pour la difficulte
+$selectDifficulte = array('selectionner'=>'selectionner','facile'=>'Facile','moyen'=>'Moyen','difficile'=>'Difficile');//drop list select pour la difficulte
+
+
+
+/////////////////////////////////////////////////debut de la liste multiselect
+$sql = 'SELECT t.rowid, t.name';//requette pour permettre l'affichage des waypoints dans la creation de la rando
+$sql.= ' FROM '.MAIN_DB_PREFIX.'wayPoint t ';
+//$sql.= ' WHERE 1=1';
+$dataresult = $db->query($sql);
+
+$TlistSelectWayPoint = array();
+// $TlistSelectWayPoint[] = 'selectionner';
+
+// $wayPoint = new wayPoint();
+
+while ($display = $db->fetch_object($dataresult)) {
+	$TlistSelectWayPoint[$display->name] =  $display->name;
+}//fin de la recherche des waypoint pour la list select
+// var_dump($TlistSelectWayPoint);
+
+
+/////////////////////////////////////fin de la recherche et de l'affichage de la liste multiselect
+
 
 $formcore = new TFormCore;
 $formcore->Set_typeaff($mode);
@@ -146,6 +169,7 @@ print $TBS->render('tpl/card.tpl.php'
 			,'showLabel' => $formcore->texte('', 'label', $object->label, 80, 255)
 			,'showDistance' => $formcore->texte('', 'distance', $object->distance, 80, 255)
 			,'showDifficulte' => $form->selectarray('difficulte', $selectDifficulte, $object->difficulte)//modification pour utiliser la drop list difficulte
+			,'showWayPoint' => $form->multiselectarray('wayPoint', $TlistSelectWayPoint, $object->wayPoint)
 //			,'showNote' => $formcore->zonetexte('', 'note', $object->note, 80, 8)
 			,'showStatus' => $object->getLibStatut(1)
 		)
@@ -161,8 +185,12 @@ print $TBS->render('tpl/card.tpl.php'
 	)
 );
 
+
+
+
 if ($mode == 'edit') echo $formcore->end_form();
 
 if ($mode == 'view' && $object->id) $somethingshown = $form->showLinkedObjectBlock($object);
+
 
 llxFooter();

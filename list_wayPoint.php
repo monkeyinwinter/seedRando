@@ -38,7 +38,7 @@ llxHeader('',$langs->trans('wayPointList'),'','');
 //if (empty($user->rights->seedrando->all->read)) $type = 'mine';
 
 // TODO ajouter les champs de son objet que l'on souhaite afficher
-$sql = 'SELECT t.rowid, t.ref, t.lattitude, t.longitude, t.date_creation, t.tms, \'\' AS action';
+$sql = 'SELECT t.rowid, t.name, t.ref, t.lattitude, t.longitude, t.date_creation, t.tms, \'\' AS action';
 
 $sql.= ' FROM '.MAIN_DB_PREFIX.'wayPoint t ';
 
@@ -67,6 +67,7 @@ echo $r->render($sql, array(
 		'date_creation' => array('search_type' => 'calendars', 'allow_is_null' => true)
 		,'tms' => array('search_type' => 'calendars', 'allow_is_null' => false)
 		,'ref' => array('search_type' => true, 'table' => 't', 'field' => 'ref')
+		,'name' => array('search_type' => true, 'table' => array('t', 't'), 'field' => array('name'))
 		,'lattitude' => array('search_type' => true, 'table' => array('t', 't'), 'field' => array('lattitude')) // input text de recherche sur plusieurs champs
 		,'longitude'=> array('search_type' => true, 'table' => array('t', 't'), 'field' => array('longitude'))
 		,'status' => array('search_type' => seedrando::$TStatus, 'to_translate' => true) // select html, la clé = le status de l'objet, 'to_translate' à true si nécessaire
@@ -86,9 +87,10 @@ echo $r->render($sql, array(
 	)
 	,'title'=>array(
 		'ref' => $langs->trans('Ref.')
+		,'name' => $langs->trans('name')
 		,'lattitude' => $langs->trans('lattitude')
 		,'longitude' => $langs->trans('longitude')
-		,'date_creation' => $langs->trans('Date Creation')
+		,'date_creation' => $langs->trans('Date Création')
 		,'tms' => $langs->trans('Date Maj')
 	)
 	,'eval'=>array(

@@ -48,6 +48,7 @@ class wayPoint extends SeedObject
 		
 		$this->fields=array(
 				'ref'=>array('type'=>'string','length'=>50,'index'=>true)
+				,'name'=>array('type'=>'string')
 				,'lattitude'=>array('type'=>'string')
 				,'longitude'=>array('type'=>'string')
 				,'status'=>array('type'=>'integer','index'=>true) // date, integer, string, float, array, text
@@ -149,8 +150,8 @@ class wayPoint extends SeedObject
 		
 		require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 		
-		$mask = !empty($conf->global->MYMODULE_REF_MASK) ? $conf->global->MYMODULE_REF_MASK : 'MM{yy}{mm}-{0000}';
-		$numero = get_next_value($db, $mask, 'seedrando', 'ref');
+		$mask = !empty($conf->global->MYMODULE_REF_MASK) ? $conf->global->MYMODULE_REF_MASK : 'WP{yy}{mm}-{0000}';
+		$numero = get_next_value($db, $mask, 'wayPoint', 'ref');
 		
 		return $numero;
 	}
@@ -180,11 +181,11 @@ class wayPoint extends SeedObject
 		global $langs;
 
         $result='';
-        $label = '<u>' . $langs->trans("Showseedrando") . '</u>';
+        $label = '<u>' . $langs->trans("Show WayPoint") . '</u>';
         if (! empty($this->ref)) $label.= '<br><b>'.$langs->trans('Ref').':</b> '.$this->ref;
         
         $linkclose = '" title="'.dol_escape_htmltag($label, 1).'" class="classfortooltip">';
-        $link = '<a href="'.dol_buildpath('/seedrando/card.php', 1).'?id='.$this->id. $get_params .$linkclose;
+        $link = '<a href="'.dol_buildpath('/seedrando/card_wayPoint.php', 1).'?id='.$this->id. $get_params .$linkclose;
        
         $linkend='</a>';
 
@@ -202,7 +203,7 @@ class wayPoint extends SeedObject
 	{
 		global $db;
 		
-		$object = new seedrando($db);
+		$object = new WayPoint($db);
 		$object->load($id, '',false);
 		
 		return $object->getNomUrl($withpicto);
@@ -216,12 +217,12 @@ class wayPoint extends SeedObject
 	public static function LibStatut($status, $mode)
 	{
 		global $langs;
-		$langs->load('seedrando@seedrando');
+		$langs->load('wayPoint@wayPoint');
 
-		if ($status==self::STATUS_DRAFT) { $statustrans='statut0'; $keytrans='seedrandoStatusDraft'; $shortkeytrans='Draft'; }
-		if ($status==self::STATUS_VALIDATED) { $statustrans='statut1'; $keytrans='seedrandoStatusValidated'; $shortkeytrans='Validate'; }
-		if ($status==self::STATUS_REFUSED) { $statustrans='statut5'; $keytrans='seedrandoStatusRefused'; $shortkeytrans='Refused'; }
-		if ($status==self::STATUS_ACCEPTED) { $statustrans='statut6'; $keytrans='seedrandoStatusAccepted'; $shortkeytrans='Accepted'; }
+		if ($status==self::STATUS_DRAFT) { $statustrans='statut0'; $keytrans='wayPointStatusDraft'; $shortkeytrans='Draft'; }
+		if ($status==self::STATUS_VALIDATED) { $statustrans='statut1'; $keytrans='wayPointStatusValidated'; $shortkeytrans='Validate'; }
+		if ($status==self::STATUS_REFUSED) { $statustrans='statut5'; $keytrans='wayPointStatusRefused'; $shortkeytrans='Refused'; }
+		if ($status==self::STATUS_ACCEPTED) { $statustrans='statut6'; $keytrans='wayPointStatusAccepted'; $shortkeytrans='Accepted'; }
 
 		
 		if ($mode == 0) return img_picto($langs->trans($keytrans), $statustrans);

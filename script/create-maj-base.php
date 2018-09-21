@@ -21,6 +21,6 @@ dol_include_once('/seedrando/class/wayPoint.class.php');
 $o=new seedrando($db);
 $o->init_db_by_vars();
 
-$o=new WayPoint($db);
+$o=new wayPoint($db);
 $o->init_db_by_vars();
 //

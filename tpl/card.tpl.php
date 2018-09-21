@@ -14,13 +14,17 @@
 
 			<tr class="distance">
 				<td width="25%">[langs.transnoentities(Distance)]</td>
-				<td>[view.showDistance;strconv=no]</td>
+				<td>[view.showDistance;strconv=no]km</td>
 			</tr>
-
 
 			<tr class="difficulte">
 				<td width="25%">[langs.transnoentities(Difficulte)]</td>
 				<td>[view.showDifficulte;strconv=no]</td>
+			</tr>
+
+			<tr class="wayPoint">
+				<td width="25%">[langs.transnoentities(wayPoint)]</td>
+				<td>[view.showWayPoint;strconv=no]</td>
 			</tr>
 
 			<tr class="status">
@@ -29,8 +33,11 @@
 			</tr>
 		</tbody>
 	</table>
-
 </div> <!-- Fin div de la fonction dol_fiche_head() -->
+
+
+
+
 
 [onshow;block=begin;when [view.mode]='edit']
 <div class="center">

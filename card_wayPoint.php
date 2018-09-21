@@ -141,6 +141,7 @@ print $TBS->render('tpl/card_wayPoint.tpl.php'
 			,'urlcard' => dol_buildpath('/seedrando/card_wayPoint.php', 1)
 			,'urllist' => dol_buildpath('/seedrando/list_wayPoint.php', 1)
 			,'showRef' => ($action == 'create') ? $langs->trans('Draft') : $form->showrefnav($object, 'ref', $linkback, 1, 'ref', 'ref', '')
+			,'showName' => $formcore->texte('', 'name', $object->name, 80, 255)
 			,'showLattitude' => $formcore->texte('', 'lattitude', $object->lattitude, 80, 255)
 			,'showLongitude' => $formcore->texte('', 'longitude', $object->longitude, 80, 255)
 //			,'showNote' => $formcore->zonetexte('', 'note', $object->note, 80, 8)

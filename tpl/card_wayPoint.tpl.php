@@ -7,6 +7,11 @@
 				<td>[view.showRef;strconv=no]</td>
 			</tr>
 
+			<tr class="name">
+				<td width="25%">[langs.transnoentities(Name)]</td>
+				<td>[view.showName;strconv=no]</td>
+			</tr>
+
 			<tr class="lattitude">
 				<td width="25%">[langs.transnoentities(Lattitude)]</td>
 				<td>[view.showLattitude;strconv=no]</td>

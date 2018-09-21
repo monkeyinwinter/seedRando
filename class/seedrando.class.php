@@ -51,6 +51,7 @@ class seedrando extends SeedObject
 				,'label'=>array('type'=>'string')
 				,'distance'=>array('type'=>'string')
 				,'difficulte'=>array('type'=>'string')
+				,'wayPoint'=>array('type'=>'array')
 				,'status'=>array('type'=>'integer','index'=>true) // date, integer, string, float, array, text
 				,'entity'=>array('type'=>'integer','index'=>true)
 		);
@@ -150,7 +151,7 @@ class seedrando extends SeedObject
 		
 		require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 		
-		$mask = !empty($conf->global->MYMODULE_REF_MASK) ? $conf->global->MYMODULE_REF_MASK : 'MM{yy}{mm}-{0000}';
+		$mask = !empty($conf->global->MYMODULE_REF_MASK) ? $conf->global->MYMODULE_REF_MASK : 'SR{yy}{mm}-{0000}';
 		$numero = get_next_value($db, $mask, 'seedrando', 'ref');
 		
 		return $numero;
