@@ -124,19 +124,34 @@ $selectDifficulte = array('selectionner'=>'selectionner','facile'=>'Facile','moy
 /////////////////////////////////////////////////debut de la liste multiselect
 $sql = 'SELECT t.rowid, t.name';//requette pour permettre l'affichage des waypoints dans la creation de la rando
 $sql.= ' FROM '.MAIN_DB_PREFIX.'wayPoint t ';
-//$sql.= ' WHERE 1=1';
+
 $dataresult = $db->query($sql);
 
 $TlistSelectWayPoint = array();
-// $TlistSelectWayPoint[] = 'selectionner';
 
-// $wayPoint = new wayPoint();
+$wayPoint = new wayPoint($db);
+
+// var_dump($wayPoint);
 
 while ($display = $db->fetch_object($dataresult)) {
+
 	$TlistSelectWayPoint[$display->name] =  $display->name;
-}//fin de la recherche des waypoint pour la list select
+}
+//fin de la recherche des waypoint pour la list select
 // var_dump($TlistSelectWayPoint);
 
+foreach ($TlistSelectWayPoint as $key => $value)
+{
+	$test = $wayPoint -> {$key} = $value;
+	var_dump($test);
+	
+}
+
+// foreach($TlistSelectWayPoint as $value)
+// {
+// 	$test = $wayPoint->$value;
+// 	var_dump($test);
+// }
 
 /////////////////////////////////////fin de la recherche et de l'affichage de la liste multiselect
 
