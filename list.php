@@ -115,7 +115,7 @@ function _printWayPoint($list =''){//fonction qui permet de recuperer une liste 
 	{
 		$list = stripslashes($list);//enleve l'antislash sinon ça plante
 		$test = unserialize($list);
-		$test = implode(" , ", $test);//separe les differend elements par un espace et une virgule avant et après
+		$test = implode(" , ", $test);//separe les differend elements par un espace après la virgule
 
 		if (strlen($test)<35)//verifie la longueur de la chaine pour eviter d'avoir une liste trop longue
 		{

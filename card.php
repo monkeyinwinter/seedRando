@@ -6,6 +6,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
 
 dol_include_once('/seedrando/class/seedrando.class.php');
 dol_include_once('/seedrando/class/wayPoint.class.php');
+dol_include_once('/seedrando/class/relationTable.class.php');
 dol_include_once('/seedrando/lib/seedrando.lib.php');
 
 if(empty($user->rights->seedrando->read)) accessforbidden();
@@ -21,6 +22,8 @@ if (empty($user->rights->seedrando->write)) $mode = 'view'; // Force 'view' mode
 else if ($action == 'create' || $action == 'edit') $mode = 'edit';
 
 $object = new seedrando($db);
+
+$objectRelationTable = new relationTable($db);
 
 if (!empty($id)) $object->load($id, '');
 elseif (!empty($ref)) $object->loadBy($ref, 'ref');
@@ -74,7 +77,6 @@ if (empty($reshook))
 			break;
 		case 'modif':
 			if (!empty($user->rights->seedrando->write)) $object->setDraft();
-				
 			break;
 		case 'confirm_validate':
 			if (!empty($user->rights->seedrando->write)) $object->setValid();
@@ -117,45 +119,6 @@ else
 	dol_fiche_head($head, 'card', $langs->trans("seedrando"), 0, $picto);
 }
 
-$selectDifficulte = array('selectionner'=>'selectionner','facile'=>'Facile','moyen'=>'Moyen','difficile'=>'Difficile');//drop list select pour la difficulte
-
-
-
-/////////////////////////////////////////////////debut de la liste multiselect
-$sql = 'SELECT t.rowid, t.name';//requette pour permettre l'affichage des waypoints dans la creation de la rando
-$sql.= ' FROM '.MAIN_DB_PREFIX.'wayPoint t ';
-
-$dataresult = $db->query($sql);
-
-$TlistSelectWayPoint = array();
-
-$wayPoint = new wayPoint($db);
-
-// var_dump($wayPoint);
-
-while ($display = $db->fetch_object($dataresult)) {
-
-	$TlistSelectWayPoint[$display->name] =  $display->name;
-}
-//fin de la recherche des waypoint pour la list select
-// var_dump($TlistSelectWayPoint);
-
-foreach ($TlistSelectWayPoint as $key => $value)
-{
-	$test = $wayPoint -> {$key} = $value;
-	var_dump($test);
-	
-}
-
-// foreach($TlistSelectWayPoint as $value)
-// {
-// 	$test = $wayPoint->$value;
-// 	var_dump($test);
-// }
-
-/////////////////////////////////////fin de la recherche et de l'affichage de la liste multiselect
-
-
 $formcore = new TFormCore;
 $formcore->Set_typeaff($mode);
 
@@ -171,41 +134,128 @@ $TBS->TBS->noerr=true;
 if ($mode == 'edit') echo $formcore->begin_form($_SERVER['PHP_SELF'], 'form_seedrando');
 
 $linkback = '<a href="'.dol_buildpath('/seedrando/list.php', 1).'">' . $langs->trans("BackToList") . '</a>';
-print $TBS->render('tpl/card.tpl.php'
-	,array() // Block
-	,array(
-		'object'=>$object
-		,'view' => array(
-			'mode' => $mode
-			,'action' => 'save'
-			,'urlcard' => dol_buildpath('/seedrando/card.php', 1)
-			,'urllist' => dol_buildpath('/seedrando/list.php', 1)
-			,'showRef' => ($action == 'create') ? $langs->trans('Draft') : $form->showrefnav($object, 'ref', $linkback, 1, 'ref', 'ref', '')
-			,'showLabel' => $formcore->texte('', 'label', $object->label, 80, 255)
-			,'showDistance' => $formcore->texte('', 'distance', $object->distance, 80, 255)
-			,'showDifficulte' => $form->selectarray('difficulte', $selectDifficulte, $object->difficulte)//modification pour utiliser la drop list difficulte
-			,'showWayPoint' => $form->multiselectarray('wayPoint', $TlistSelectWayPoint, $object->wayPoint)
-//			,'showNote' => $formcore->zonetexte('', 'note', $object->note, 80, 8)
-			,'showStatus' => $object->getLibStatut(1)
-		)
-		,'langs' => $langs
-		,'user' => $user
-		,'conf' => $conf
-		,'seedrando' => array(
-			'STATUS_DRAFT' => seedrando::STATUS_DRAFT
-			,'STATUS_VALIDATED' => seedrando::STATUS_VALIDATED
-			,'STATUS_REFUSED' => seedrando::STATUS_REFUSED
-			,'STATUS_ACCEPTED' => seedrando::STATUS_ACCEPTED
-		)
-	)
-);
 
 
+//////////////////////////////////////////////////////////////////////debut bidouille pour effecuer l'affichage en ligne string  ou en list select
+// var_dump($id);
+// var_dump($mode);
 
+if ($mode != 'view' || $id === '')//mode edit
+{
+	/////////////////////////////////////////////////debut de la liste multiselect
+	$sql = 'SELECT t.rowid, t.name';//requette pour permettre l'affichage des waypoints dans la creation de la rando
+	$sql.= ' FROM '.MAIN_DB_PREFIX.'wayPoint t ';
+	
+	$dataresult = $db->query($sql);
+	
+	$TlistSelectWayPoint = array();
+	
+	$wayPoint = new wayPoint($db);
+	
+	while ($display = $db->fetch_object($dataresult)) {
+		
+		$TlistSelectWayPoint[$display->name] =  $display->name;
+	}
+	
+	/////////////////////////////////////fin de la recherche pour l'affichage de la liste multiselect
+	$selectDifficulte = array('selectionner'=>'selectionner','facile'=>'Facile','moyen'=>'Moyen','difficile'=>'Difficile');//drop list select pour la difficulte
+	
+	print $TBS->render('tpl/card.tpl.php'
+		,array() // Block
+			,array(
+					'object'=>$object
+					,'view' => array(
+							'mode' => $mode
+							,'action' => 'save'
+							,'urlcard' => dol_buildpath('/seedrando/card.php', 1)
+							,'urllist' => dol_buildpath('/seedrando/list.php', 1)
+							,'showRef' => ($action == 'create') ? $langs->trans('Draft') : $form->showrefnav($object, 'ref', $linkback, 1, 'ref', 'ref', '')
+							,'showLabel' => $formcore->texte('', 'label', $object->label, 80, 255)
+							,'showDistance' => $formcore->texte('', 'distance', $object->distance, 80, 255)
+							,'showDifficulte' => $form->selectarray('difficulte', $selectDifficulte, $object->difficulte)//modification pour utiliser la drop list difficulte
+							,'showWayPoint' => $form->multiselectarray('wayPoint', $TlistSelectWayPoint, $object->wayPoint)//modification pour utiliser la drop list waypoint
+							//	,'showNote' => $formcore->zonetexte('', 'note', $object->note, 80, 8)
+							,'showStatus' => $object->getLibStatut(1)
+					)
+					,'langs' => $langs
+					,'user' => $user
+					,'conf' => $conf
+					,'seedrando' => array(
+							'STATUS_DRAFT' => seedrando::STATUS_DRAFT
+							,'STATUS_VALIDATED' => seedrando::STATUS_VALIDATED
+							,'STATUS_REFUSED' => seedrando::STATUS_REFUSED
+							,'STATUS_ACCEPTED' => seedrando::STATUS_ACCEPTED
+					)
+			)
+		);
+}
+
+if ($mode ==='view' and $id != '')//mode view
+{
+	$sql = 'SELECT t.difficulte';//requette pour permettre l'affichage de la difficulte dans l'affichage de la rando
+	$sql.= ' FROM '.MAIN_DB_PREFIX.'seedrando t';
+	$sql .= ' WHERE rowid = ' .$id;
+	
+	$dataresult = $db->query($sql);
+	
+	while ($display = $db->fetch_object($dataresult)) {
+		
+		$difficulte = $display->difficulte;
+	}
+	
+	$sql = 'SELECT t.wayPoint';//requette pour permettre l'affichage des waypoint dans l'affichage de la rando
+	$sql.= ' FROM '.MAIN_DB_PREFIX.'seedrando t';
+	$sql .= ' WHERE rowid = ' .$id;
+	
+	$dataresult = $db->query($sql);
+	
+	$stringOut = "";
+	
+	$display = $db->fetch_object($dataresult);
+	
+	foreach ($display as $value)
+	{
+		$stringOut = $stringOut .$value;
+	}
+	
+	$stringOut = stripslashes($stringOut);//enleve l'antislash sinon ça plante
+	$stringOut = unserialize($stringOut);//permet de séparer les elements du champ de la table
+	$stringOut = implode(", ", $stringOut);//separe les differend elements par un espace après la virgule
+	
+	print $TBS->render('tpl/card.tpl.php'
+		,array() // Block
+			,array(
+					'object'=>$object
+					,'view' => array(
+							'mode' => $mode
+							,'action' => 'save'
+							,'urlcard' => dol_buildpath('/seedrando/card.php', 1)
+							,'urllist' => dol_buildpath('/seedrando/list.php', 1)
+							,'showRef' => ($action == 'create') ? $langs->trans('Draft') : $form->showrefnav($object, 'ref', $linkback, 1, 'ref', 'ref', '')
+							,'showLabel' => $formcore->texte('', 'label', $object->label, 80, 255)
+							,'showDistance' => $formcore->texte('', 'distance', $object->distance, 80, 255)
+							,'showDifficulte' => $difficulte//modification pour utiliser la drop list difficulte
+							,'showWayPoint' => $stringOut//modification pour utiliser la drop list waypoint
+							//	,'showNote' => $formcore->zonetexte('', 'note', $object->note, 80, 8)
+							,'showStatus' => $object->getLibStatut(1)
+					)
+					,'langs' => $langs
+					,'user' => $user
+					,'conf' => $conf
+					,'seedrando' => array(
+							'STATUS_DRAFT' => seedrando::STATUS_DRAFT
+							,'STATUS_VALIDATED' => seedrando::STATUS_VALIDATED
+							,'STATUS_REFUSED' => seedrando::STATUS_REFUSED
+							,'STATUS_ACCEPTED' => seedrando::STATUS_ACCEPTED
+					)
+			)
+		);
+	
+}
+//////////////////////////////////////////////////////////////////////fin bidouille pour effecuer l'affichage en ligne string ou en list select
 
 if ($mode == 'edit') echo $formcore->end_form();
 
 if ($mode == 'view' && $object->id) $somethingshown = $form->showLinkedObjectBlock($object);
-
 
 llxFooter();

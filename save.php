@@ -112,7 +112,7 @@ if (!empty($id))
 
 $sql = 'SELECT t.rowid, t.name';//requette pour permettre l'affichage des waypoints dans la creation de la rando
 $sql.= ' FROM '.MAIN_DB_PREFIX.'wayPoint t ';
-//$sql.= ' WHERE 1=1';
+//$sql.= ' WHERE 1=1';$form->selectarray
 $dataresult = $db->query($sql);
 
 $TlistSelectWayPoint = array();
@@ -128,3 +128,19 @@ while ($display = $db->fetch_object($dataresult)) {
 	$TlistSelectWayPoint[$display->name] =  $display->name;
 }//fin de la recherche des waypoint pour la list select
 // var_dump($TlistSelectWayPoint);
+
+
+
+
+
+
+
+
+,'showDifficulte' => $form->selectarray('difficulte', $selectDifficulte, $object->difficulte)
+
+
+
+
+
+
+
