@@ -1,5 +1,6 @@
 <!-- Un début de <div> existe de par la fonction dol_fiche_head() -->
 	<input type="hidden" name="action" value="[view.action]" />
+	
 	<table width="100%" class="border">
 		<tbody>
 			<tr class="ref">
@@ -22,7 +23,7 @@
 				<td>[view.showDifficulte;strconv=no]</td>
 			</tr>
 
-			<tr class="wayPoint">
+			<tr class="showWayPoint">
 				<td width="25%">[langs.transnoentities(wayPoint)]</td>
 				<td>[view.showWayPoint;strconv=no]</td>
 			</tr>
@@ -45,6 +46,7 @@
 	<!-- '+-' est l'équivalent d'un signe '>' (TBS oblige) -->
 	[onshow;block=begin;when [object.id]+-0]
 	<input type='hidden' name='id' value='[object.id]' />
+	
 	<input type="submit" value="[langs.transnoentities(Save)]" class="button" />
 	[onshow;block=end]
 	

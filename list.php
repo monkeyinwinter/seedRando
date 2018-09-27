@@ -37,7 +37,7 @@ llxHeader('',$langs->trans('seedrandoList'),'','');
 //if (empty($user->rights->seedrando->all->read)) $type = 'mine';
 
 // TODO ajouter les champs de son objet que l'on souhaite afficher
-$sql = 'SELECT t.rowid, t.ref, t.label, t.distance, t.difficulte, t.wayPoint, t.date_creation, t.tms, \'\' AS action';
+$sql = 'SELECT t.rowid, t.ref, t.label, t.distance, t.difficulte, t.date_creation, t.tms, \'\' AS action';
 
 $sql.= ' FROM '.MAIN_DB_PREFIX.'seedrando t ';
 
@@ -69,7 +69,6 @@ echo $r->render($sql, array(
 		,'label' => array('search_type' => true, 'table' => array('t', 't'), 'field' => array('label')) // input text de recherche sur plusieurs champs
 		,'distance'=> array('search_type' => true, 'table' => array('t', 't'), 'field' => array('distance'))
 		,'difficulte' => array('search_type' => true, 'table' => array('t', 't'), 'field' => array('difficulte'))
-		,'wayPoint' => array('search_type' => true, 'table' => array('t', 't'), 'field' => array('wayPoint'))
 		,'status' => array('search_type' => seedrando::$TStatus, 'to_translate' => true) // select html, la clé = le status de l'objet, 'to_translate' à true si nécessaire
 	)
 	,'translate' => array()
@@ -90,7 +89,6 @@ echo $r->render($sql, array(
 		,'label' => $langs->trans('Label')
 		,'distance' => $langs->trans('Distance en km')
 		,'difficulte' => $langs->trans('Difficulte')
-		,'wayPoint' => $langs->trans('wayPoint')
 		,'date_creation' => $langs->trans('Date Création')
 		,'tms' => $langs->trans('Date Maj')
 	)
@@ -110,24 +108,24 @@ $formcore->end_form();
 llxFooter('');
 
 
-function _printWayPoint($list =''){//fonction qui permet de recuperer une liste à partir d'un tableau
-	if(!empty($list))
-	{
-		$list = stripslashes($list);//enleve l'antislash sinon ça plante
-		$test = unserialize($list);
-		$test = implode(" , ", $test);//separe les differend elements par un espace après la virgule
+// function _printWayPoint($list =''){//fonction qui permet de recuperer une liste à partir d'un tableau
+// 	if(!empty($list))
+// 	{
+// 		$list = stripslashes($list);//enleve l'antislash sinon ça plante
+// 		$test = unserialize($list);
+// 		$test = implode(" , ", $test);//separe les differend elements par un espace après la virgule
 
-		if (strlen($test)<35)//verifie la longueur de la chaine pour eviter d'avoir une liste trop longue
-		{
-			return $test;
-		}
-		elseif (strlen($test)>35)
-		{
-			$test = substr($test, 0, 35);//n'affiche que les caractere de 0 à 35
-			return $test .'...';
-		}
-	}
-}
+// 		if (strlen($test)<35)//verifie la longueur de la chaine pour eviter d'avoir une liste trop longue
+// 		{
+// 			return $test;
+// 		}
+// 		elseif (strlen($test)>35)
+// 		{
+// 			$test = substr($test, 0, 35);//n'affiche que les caractere de 0 à 35
+// 			return $test .'...';
+// 		}
+// 	}
+// }
 
 /**
  * TODO remove if unused

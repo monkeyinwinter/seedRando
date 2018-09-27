@@ -11,11 +11,37 @@ dol_include_once('/seedrando/lib/seedrando.lib.php');
 
 if(empty($user->rights->seedrando->read)) accessforbidden();
 
+
 $langs->load('seedrando@seedrando');
+
+// $TreturnRelationTable = GETPOST('wayPoint');
 
 $action = GETPOST('action');
 $id = GETPOST('id', 'int');
 $ref = GETPOST('ref');
+
+$ref = GETPOST('ref');
+$ref = GETPOST('ref');
+
+$TreturnRelationTable = GETPOST('name');
+
+echo 'action = '.$action;
+echo '<br>mode = ' .$mode;
+var_dump($TreturnRelationTable);
+
+if($action == 'edit' AND !empty($TreturnRelationTable) )
+{
+	foreach ($TreturnRelationTable AS $value)
+	{
+		$In = new relationTable($db);
+		
+		$In -> fk_seedRando = $id;
+		$In -> fk_wayPoint = $value;
+		
+		$In -> create($user);
+	}
+}
+
 
 $mode = 'view';
 if (empty($user->rights->seedrando->write)) $mode = 'view'; // Force 'view' mode if can't edit object
@@ -136,30 +162,15 @@ if ($mode == 'edit') echo $formcore->begin_form($_SERVER['PHP_SELF'], 'form_seed
 $linkback = '<a href="'.dol_buildpath('/seedrando/list.php', 1).'">' . $langs->trans("BackToList") . '</a>';
 
 
-//////////////////////////////////////////////////////////////////////debut bidouille pour effecuer l'affichage en ligne string  ou en list select
-// var_dump($id);
-// var_dump($mode);
 
-if ($mode != 'view' || $id === '')//mode edit
-{
-	/////////////////////////////////////////////////debut de la liste multiselect
-	$sql = 'SELECT t.rowid, t.name';//requette pour permettre l'affichage des waypoints dans la creation de la rando
-	$sql.= ' FROM '.MAIN_DB_PREFIX.'wayPoint t ';
-	
-	$dataresult = $db->query($sql);
-	
-	$TlistSelectWayPoint = array();
-	
-	$wayPoint = new wayPoint($db);
-	
-	while ($display = $db->fetch_object($dataresult)) {
-		
-		$TlistSelectWayPoint[$display->name] =  $display->name;
-	}
-	
-	/////////////////////////////////////fin de la recherche pour l'affichage de la liste multiselect
-	$selectDifficulte = array('selectionner'=>'selectionner','facile'=>'Facile','moyen'=>'Moyen','difficile'=>'Difficile');//drop list select pour la difficulte
-	
+/////////////////////////////////////fin de la recherche pour l'affichage de la liste multiselect
+$selectDifficulte = array('selectionner'=>'selectionner','facile'=>'Facile','moyen'=>'Moyen','difficile'=>'Difficile');//drop list select pour la difficulte
+
+
+
+
+$objectWayPoint = new wayPoint($db);
+
 	print $TBS->render('tpl/card.tpl.php'
 		,array() // Block
 			,array(
@@ -172,9 +183,8 @@ if ($mode != 'view' || $id === '')//mode edit
 							,'showRef' => ($action == 'create') ? $langs->trans('Draft') : $form->showrefnav($object, 'ref', $linkback, 1, 'ref', 'ref', '')
 							,'showLabel' => $formcore->texte('', 'label', $object->label, 80, 255)
 							,'showDistance' => $formcore->texte('', 'distance', $object->distance, 80, 255)
-							,'showDifficulte' => $form->selectarray('difficulte', $selectDifficulte, $object->difficulte)//modification pour utiliser la drop list difficulte
-							,'showWayPoint' => $form->multiselectarray('wayPoint', $TlistSelectWayPoint, $object->wayPoint)//modification pour utiliser la drop list waypoint
-							//	,'showNote' => $formcore->zonetexte('', 'note', $object->note, 80, 8)
+							,'showWayPoint' => _get_showWayPoint($objectWayPoint, $TlistSelectWayPoint,  $mode, $id, $db)//modification pour utiliser la drop list difficulte
+							,'showDifficulte' => _get_showDifficulte($object, $selectDifficulte,  $mode)//modification pour utiliser la drop list difficulte
 							,'showStatus' => $object->getLibStatut(1)
 					)
 					,'langs' => $langs
@@ -188,71 +198,96 @@ if ($mode != 'view' || $id === '')//mode edit
 					)
 			)
 		);
-}
 
-if ($mode ==='view' and $id != '')//mode view
-{
-	$sql = 'SELECT t.difficulte';//requette pour permettre l'affichage de la difficulte dans l'affichage de la rando
-	$sql.= ' FROM '.MAIN_DB_PREFIX.'seedrando t';
-	$sql .= ' WHERE rowid = ' .$id;
-	
-	$dataresult = $db->query($sql);
-	
-	while ($display = $db->fetch_object($dataresult)) {
-		
-		$difficulte = $display->difficulte;
-	}
-	
-	$sql = 'SELECT t.wayPoint';//requette pour permettre l'affichage des waypoint dans l'affichage de la rando
-	$sql.= ' FROM '.MAIN_DB_PREFIX.'seedrando t';
-	$sql .= ' WHERE rowid = ' .$id;
-	
-	$dataresult = $db->query($sql);
-	
-	$stringOut = "";
-	
-	$display = $db->fetch_object($dataresult);
-	
-	foreach ($display as $value)
+	function _get_showWayPoint($objectWayPoint, $TlistSelectWayPoint, $mode = 'view', $id, $db)
 	{
-		$stringOut = $stringOut .$value;
+		global $form;
+		
+		$test = 'tottoo';
+		
+		if(!empty($id))
+		{
+			if($mode == 'view')
+			{
+				$test = get_stringOut($id, $db);
+				return $test;
+			}
+			elseif ($mode == 'edit')
+			{
+				$test = get_multiselectarray($TlistSelectWayPoint, $objectWayPoint, $db);
+				return $test;
+				
+			}
+		}
+		return;
 	}
 	
-	$stringOut = stripslashes($stringOut);//enleve l'antislash sinon ça plante
-	$stringOut = unserialize($stringOut);//permet de séparer les elements du champ de la table
-	$stringOut = implode(", ", $stringOut);//separe les differend elements par un espace après la virgule
+	function _get_showDifficulte($object, $selectDifficulte, $mode = 'view')
+	{
+		global $form;
+		if($mode == 'view')
+		{
+			return $object->difficulte;
+		}
+		elseif ($mode == 'edit')
+		{
+			return $form->selectarray('difficulte', $selectDifficulte, $object->difficulte); //modification pour utiliser la drop list difficulte
+		}
+		
+		return '';
+	}
 	
-	print $TBS->render('tpl/card.tpl.php'
-		,array() // Block
-			,array(
-					'object'=>$object
-					,'view' => array(
-							'mode' => $mode
-							,'action' => 'save'
-							,'urlcard' => dol_buildpath('/seedrando/card.php', 1)
-							,'urllist' => dol_buildpath('/seedrando/list.php', 1)
-							,'showRef' => ($action == 'create') ? $langs->trans('Draft') : $form->showrefnav($object, 'ref', $linkback, 1, 'ref', 'ref', '')
-							,'showLabel' => $formcore->texte('', 'label', $object->label, 80, 255)
-							,'showDistance' => $formcore->texte('', 'distance', $object->distance, 80, 255)
-							,'showDifficulte' => $difficulte//modification pour utiliser la drop list difficulte
-							,'showWayPoint' => $stringOut//modification pour utiliser la drop list waypoint
-							//	,'showNote' => $formcore->zonetexte('', 'note', $object->note, 80, 8)
-							,'showStatus' => $object->getLibStatut(1)
-					)
-					,'langs' => $langs
-					,'user' => $user
-					,'conf' => $conf
-					,'seedrando' => array(
-							'STATUS_DRAFT' => seedrando::STATUS_DRAFT
-							,'STATUS_VALIDATED' => seedrando::STATUS_VALIDATED
-							,'STATUS_REFUSED' => seedrando::STATUS_REFUSED
-							,'STATUS_ACCEPTED' => seedrando::STATUS_ACCEPTED
-					)
-			)
-		);
+	function get_multiselectarray ($TlistSelectWayPoint, $objectWayPoint, $db)
+	{
+		global $form;
+		//recuperer laliste complete des wayPoints
+		$sql = 'SELECT t.rowid, t.name';//requette pour permettre l'affichage des waypoints dans la creation de la rando
+		
+		$sql.= ' FROM '.MAIN_DB_PREFIX.'wayPoint t ';
+		
+		$dataresult = $db->query($sql);
+		
+		$TlistSelectWayPoint = array();
+		
+		while ($display = $db->fetch_object($dataresult)) {
+			$TlistSelectWayPoint[$display->rowid] =  $display->name;
+		}
+		
+		$test = $form->multiselectarray('name', $TlistSelectWayPoint, $objectWayPoint->name); //modification pour utiliser la drop list difficulte
+		return $test;
+	}
 	
-}
-//////////////////////////////////////////////////////////////////////fin bidouille pour effecuer l'affichage en ligne string ou en list select
+	function get_stringOut($id, $db)
+	{
+		$sql = 'SELECT t.fk_wayPoint';//requette pour permettre l'affichage des waypoints dans la creation de la rando
+		$sql.= ' FROM '.MAIN_DB_PREFIX.'relationTable t WHERE fk_seedRando = ' .$id;
+		
+		$dataresult = $db->query($sql);
+		
+		$TlistOfMyWayPoint = array();
+
+		while ($display = $db->fetch_object($dataresult)) {
+			
+			$TlistOfMyWayPoint[] = $display->fk_wayPoint;
+		}
+		//j'ai recuperer les fk_wayPoint de la table relationTable
+
+		//j'itere sur mon tableau $listOfMyWayPoint pour recuperer mes objets wayPoint
+		$stringOut = array();
+		foreach ($TlistOfMyWayPoint AS $value)
+		{
+			$sql = 'SELECT t.name';//requette pour permettre l'affichage des waypoints dans la creation de la rando
+			$sql.= ' FROM '.MAIN_DB_PREFIX.'wayPoint t WHERE rowid = ' .$value;
+						
+			$dataresult = $db->query($sql);
+						
+			$display = $db->fetch_object($dataresult);
+							
+			$stringOut[] = $display->name;
+		}
+		return implode(", ", $stringOut);
+	}
+	
 
 if ($mode == 'edit') echo $formcore->end_form();
 

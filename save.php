@@ -140,7 +140,7 @@ while ($display = $db->fetch_object($dataresult)) {
 
 
 
-
+($id != '')? $object->WayPoint : 
 
 
 
