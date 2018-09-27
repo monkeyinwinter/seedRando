@@ -51,7 +51,6 @@ class seedrando extends SeedObject
 				,'label'=>array('type'=>'string')
 				,'distance'=>array('type'=>'string')
 				,'difficulte'=>array('type'=>'string')
-				,'wayPoint'=>array('type'=>'array')
 				,'status'=>array('type'=>'integer','index'=>true) // date, integer, string, float, array, text
 				,'entity'=>array('type'=>'integer','index'=>true)
 		);
@@ -80,6 +79,18 @@ class seedrando extends SeedObject
 			$this->withChild = false;
 			$res = $this->id>0 ? $this->updateCommon($user) : $this->createCommon($user);
 			$this->withChild = $wc;
+		}
+		
+		$wayPoint = new WayPoint($this->db);
+		
+		// Sauvegarde de tous lew waypoint si il y en @author thibault
+		if(!empty($this->wayPoint)) {
+			foreach($this->wayPoint as $value) {
+				$In = new relationTable($this->db);
+				$In -> fk_seedRando = $this->id;
+				$In -> fk_wayPoint = $value;
+				$In -> create($user);
+			}
 		}
 		
 		return $res;

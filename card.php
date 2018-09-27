@@ -23,26 +23,6 @@ $ref = GETPOST('ref');
 $ref = GETPOST('ref');
 $ref = GETPOST('ref');
 
-$TreturnRelationTable = GETPOST('name');
-
-echo 'action = '.$action;
-echo '<br>mode = ' .$mode;
-var_dump($TreturnRelationTable);
-
-if($action == 'edit' AND !empty($TreturnRelationTable) )
-{
-	foreach ($TreturnRelationTable AS $value)
-	{
-		$In = new relationTable($db);
-		
-		$In -> fk_seedRando = $id;
-		$In -> fk_wayPoint = $value;
-		
-		$In -> create($user);
-	}
-}
-
-
 $mode = 'view';
 if (empty($user->rights->seedrando->write)) $mode = 'view'; // Force 'view' mode if can't edit object
 else if ($action == 'create' || $action == 'edit') $mode = 'edit';
@@ -70,6 +50,9 @@ if (empty($reshook))
 	$error = 0;
 	switch ($action) {
 		case 'save':
+			//$_REQUEST['wayPoint'] = $TreturnRelationTable;
+			
+			
 			$object->setValues($_REQUEST); // Set standard attributes
 			
 //			$object->date_other = dol_mktime(GETPOST('starthour'), GETPOST('startmin'), 0, GETPOST('startmonth'), GETPOST('startday'), GETPOST('startyear'));
@@ -253,7 +236,7 @@ $objectWayPoint = new wayPoint($db);
 			$TlistSelectWayPoint[$display->rowid] =  $display->name;
 		}
 		
-		$test = $form->multiselectarray('name', $TlistSelectWayPoint, $objectWayPoint->name); //modification pour utiliser la drop list difficulte
+		$test = $form->multiselectarray('wayPoint', $TlistSelectWayPoint, $objectWayPoint->name); //modification pour utiliser la drop list difficulte
 		return $test;
 	}
 	
