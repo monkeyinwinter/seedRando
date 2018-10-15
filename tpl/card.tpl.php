@@ -102,7 +102,7 @@
 </table>
 
 <form action="xxxxxxxxxxxxxxxx" method="POST">
-	<input name="xxx" type="hidden">
+	<input name="xxxxxxx" type="hidden">
 	<input name="action" type="hidden">
 	<table class="noborder" width="100%">
 		<tbody>
@@ -136,6 +136,9 @@
 				<!--  ici afficher la liste des objets contact en relation avec la rowid de la rando concernée -->
 				
 				<td class="opacitymedium" colspan="3">
+					<div id="test">
+						[view.showListContact;strconv=no]
+					</div>
 					Aucun
 				</td>
 			</tr>

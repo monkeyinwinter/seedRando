@@ -33,7 +33,9 @@ $object = new seedrando($db);
 
 $objectRelationTable = new relationTable($db);
 
-$SelectContact = new contact($db);
+$objectContact = new contact($db);
+
+$objectRandoContact = new relationRandoContact($db);
 
 if (!empty($id)) $object->load($id, '');
 elseif (!empty($ref)) $object->loadBy($ref, 'ref');
@@ -173,6 +175,7 @@ print $TBS->render('tpl/card.tpl.php'
 						,'showWayPoint' => _get_showWayPoint($objectWayPoint, $TlistSelectWayPoint,  $mode, $id, $db)//modification pour utiliser la drop list difficulte
 						,'showDifficulte' => _get_showDifficulte($object, $selectDifficulte,  $mode)//modification pour utiliser la drop list difficulte
 						,'showContact' => _get_showContact($objectContact, $db)
+						,'showListContact' => _get_listContact($objectRandoContact, $db)
 						,'showStatus' => $object->getLibStatut(1)
 				)
 				,'langs' => $langs
@@ -201,20 +204,58 @@ function _get_showContact ($objectContact, $db)
 	
 	$dataresult = $db->query($sql);
 	
-	$SelectContact = array();
+	$TlistSelectContact = array();
 	
 	while ($display = $db->fetch_object($dataresult)) {
 		$TlistSelectContact[$display->rowid] =  $display->firstname . " ". $display->lastname;
 	}
-// 	$TlistContact = $TlistSelectContact;
-	$TlistContact = $form->selectarray('listContact', $TlistSelectContact, $objectContact->firstname, $objectContact->lastname ); //modification pour utiliser la drop list difficulte
-	return $TlistContact;
+
+	$TlistSelectContact = $form->selectarray('listSelectContact', $TlistSelectContact, $objectContact->firstname, $objectContact->lastname ); //modification pour utiliser la drop list difficulte
+	return $TlistSelectContact;
 }
 
-$TlistContact = _get_showContact($objectContact,$db);
+function _get_listContact($objectRandoContact, $db)
+{
+	$sql = 'SELECT t.fk_socpeople_target';//requette pour permettre l'affichage des contacts dans les objets liès de la rando
+	$sql.= ' FROM '.MAIN_DB_PREFIX.'relationRandoContact t ';
+	
+	$dataresult = $db->query($sql);
+	$TlistContact = array();
+		
+	while ($add = $db->fetch_object($dataresult)) {
+		$TlistContact[] =  $add->fk_socpeople_target;
+	}
+	
+// 	j'ai recuperer les contacts de la table relationRandoContact
+	
+// 	j'itere sur mon tableau $TlistContact pour recuperer mes objets relationRandoContact
 
-// echo "totot";
-// var_dump($TlistContact);
+	$stringOut = array();
+	
+	foreach ($TlistContact AS $value)
+	{
+		$sql = 'SELECT t.firstname, t.lastname';//requette pour permettre l'affichage des relationRandoContact
+		$sql.= ' FROM '.MAIN_DB_PREFIX.'socpeople t ';
+		
+		$dataresult = $db->query($sql);
+		
+		$display = $db->fetch_object($dataresult);
+		
+		$stringOut[] = $display->firstname ." ". $display->lastname;
+	}
+	
+// 	var_dump($stringOut);
+	return implode("<br>", $stringOut);
+}
+
+
+
+
+
+
+
+
+
 
 function _get_showWayPoint($objectWayPoint, $TlistSelectWayPoint, $mode = 'view', $id, $db)
 {

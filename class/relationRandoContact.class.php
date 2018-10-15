@@ -49,9 +49,9 @@ class relationRandoContact extends SeedObject
 		$this->fields=array(
 				'ref'=>array('type'=>'string','length'=>50,'index'=>true)
 				,'source_type_object'=>array('type'=>'string')
-				,'target_type_object_'=>array('type'=>'string')
+				,'target_type_object'=>array('type'=>'string')
 				,'fk_seedRando_source'=>array('type'=>'string')
-				,'fk_wayPoint_target'=>array('type'=>'string')
+				,'fk_socpeople_target'=>array('type'=>'string')
 				,'status'=>array('type'=>'integer','index'=>true) // date, integer, string, float, array, text
 				,'entity'=>array('type'=>'integer','index'=>true)
 		);
