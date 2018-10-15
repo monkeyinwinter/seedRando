@@ -96,7 +96,7 @@
 <table summary="" class="centpercent notopnoleftnoright showlinkedobjectblock" style="margin-bottom: 2px;">
 	<tr>
 		<td class="nobordernopadding" valign="middle">
-			<div class="titre">Mon titre, mes contact à lier</div>
+			<div class="titre">Mes contact à lier</div>
 		</td>
 	</tr>
 </table>
@@ -116,17 +116,20 @@
 					<span class="select2 select2-container select2-container--default" style ="width: 200px;">
 						<span class="selection">
 							<span class="select2-selection select2-selection--single flat minwidth200" role="combobox" aria-haspopup="true" tabindex="0" aria-labelledby="select2-group-container">
+							
 <!-- 								<span id="select2-group-container" class="select2-selection__rendered" title=""></span> -->
 <!-- 								<span class="select2-selection__arrow" role="presentation"> -->
 <!-- 									<b role="presentation"></b> -->
 <!-- 								</span> -->
 
+								<!--   a modifier c'est pour un test 
+										ici afficher la liste de tous les contacts donc requette fetch all contact -->
+										
 								<select id="difficulte" name="difficulte">
 									<option value="facile">Facile</option>
 									<option value="moyenne">Moyenne</option>
 									<option value="difficile">Difficile</option>
 								</select>
-								
 								
 							</span>
 						</span>
@@ -136,7 +139,12 @@
 				</th>
 			</tr>
 			<tr class="oddeven">
-				<td class="opacitymedium" colspan="3">Aucun</td>
+			
+				<!--  ici afficher la liste des objets contact en relation avec la rowid de la rando concernée -->
+				
+				<td class="opacitymedium" colspan="3">
+					Aucun
+				</td>
 			</tr>
 		</tbody>
 	</table>
