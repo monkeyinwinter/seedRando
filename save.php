@@ -125,7 +125,9 @@ $TlistSelectWayPoint = array();
 
 while ($display = $db->fetch_object($dataresult)) {
 
-	$TlistSelectWayPoint[$display->name] =  $display->name;
+	$TlistSelectWayPoint[$display->name] =  $di				
+	$test = get_multiselectarray($TlistSelectWayPoint, $objectWayPoint, $db);
+	display->name;
 }//fin de la recherche des waypoint pour la list select
 // var_dump($TlistSelectWayPoint);
 

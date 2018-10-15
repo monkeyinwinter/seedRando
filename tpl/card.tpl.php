@@ -87,4 +87,73 @@
 		
 	[onshow;block=end]
 </div>
+
+
+
+
+
+
+<table summary="" class="centpercent notopnoleftnoright showlinkedobjectblock" style="margin-bottom: 2px;">
+	<tr>
+		<td class="nobordernopadding" valign="middle">
+			<div class="titre">Mon titre, mes contact à lier</div>
+		</td>
+	</tr>
+</table>
+
+<form action="WXWXWXW" method="POST">
+	<table class="noborder" width="100%">
+		<tbody>
+			<tr class="liste_titre">
+				<th class="liste_titre">
+					Contacts
+				</th>
+				<th class="liste_titre" align="right">
+					<select id="groupe" class="flat minwidth200 select2-hidden-accessible" name="groupetest" tabindex="-1" aria-hidden="true">
+						<option value="test 1">test 1</option>
+						<option value="test 2">test 2</option>
+					</select>
+					<span class="select2 select2-container select2-container--default" style ="width: 200px;">
+						<span class="selection">
+							<span class="select2-selection select2-selection--single flat minwidth200" role="combobox" aria-haspopup="true" tabindex="0" aria-labelledby="select2-group-container">
+<!-- 								<span id="select2-group-container" class="select2-selection__rendered" title=""></span> -->
+<!-- 								<span class="select2-selection__arrow" role="presentation"> -->
+<!-- 									<b role="presentation"></b> -->
+<!-- 								</span> -->
+
+								<select id="difficulte" name="difficulte">
+									<option value="facile">Facile</option>
+									<option value="moyenne">Moyenne</option>
+									<option value="difficile">Difficile</option>
+								</select>
+								
+								
+							</span>
+						</span>
+						<span class="dropdown-wrapper" aria-hidden="true"></span>
+					</span>
+					<input class="button" value="Ajouter" type="submit">
+				</th>
+			</tr>
+			<tr class="oddeven">
+				<td class="opacitymedium" colspan="3">Aucun</td>
+			</tr>
+		</tbody>
+	</table>
+</form>
+
+
+
+
+<div style="margin-bottom:250px"></div>
+
+
+
+
+
+
+
+
+
+
 [onshow;block=end]

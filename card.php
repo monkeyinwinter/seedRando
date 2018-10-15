@@ -223,9 +223,11 @@ $objectWayPoint = new wayPoint($db);
 	function get_multiselectarray ($TlistSelectWayPoint, $objectWayPoint, $db)
 	{
 		global $form;
+		global $action;
+		global $id;
+		
 		//recuperer laliste complete des wayPoints
 		$sql = 'SELECT t.rowid, t.name';//requette pour permettre l'affichage des waypoints dans la creation de la rando
-		
 		$sql.= ' FROM '.MAIN_DB_PREFIX.'wayPoint t ';
 		
 		$dataresult = $db->query($sql);
@@ -243,7 +245,8 @@ $objectWayPoint = new wayPoint($db);
 	function get_stringOut($id, $db)
 	{
 		$sql = 'SELECT t.fk_wayPoint';//requette pour permettre l'affichage des waypoints dans la creation de la rando
-		$sql.= ' FROM '.MAIN_DB_PREFIX.'relationTable t WHERE fk_seedRando = ' .$id;
+		$sql .= ' FROM '.MAIN_DB_PREFIX.'relationTable t ';
+		$sql .= ' WHERE fk_seedRando =  ' .$id;
 		
 		$dataresult = $db->query($sql);
 		
@@ -275,5 +278,7 @@ $objectWayPoint = new wayPoint($db);
 if ($mode == 'edit') echo $formcore->end_form();
 
 if ($mode == 'view' && $object->id) $somethingshown = $form->showLinkedObjectBlock($object);
+
+
 
 llxFooter();

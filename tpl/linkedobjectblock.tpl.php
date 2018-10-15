@@ -40,6 +40,7 @@ print_titre($langs->trans("seedrandoRelated"));
 	<td align="right"><?php echo $langs->trans("Status"); ?></td>
 	<td></td>
 </tr>
+
 <?php
 $var=true;
 $total=0;
@@ -54,6 +55,7 @@ foreach($linkedObjectBlock as $key => $objectlink)
 	<td align="right"><?php echo $objectlink->getLibStatut(0); ?></td>
 	<td align="right"><a href="<?php echo $_SERVER["PHP_SELF"].'?id='.$objectlink->id.'&action=dellink&dellinkid='.$key; ?>"><?php echo img_delete($langs->transnoentitiesnoconv("RemoveLink")); ?></a></td>
 </tr>
+
 <?php
 }
 ?>
