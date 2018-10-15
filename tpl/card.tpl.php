@@ -101,36 +101,29 @@
 	</tr>
 </table>
 
-<form action="WXWXWXW" method="POST">
+<form action="xxxxxxxxxxxxxxxx" method="POST">
+	<input name="xxx" type="hidden">
+	<input name="action" type="hidden">
 	<table class="noborder" width="100%">
 		<tbody>
 			<tr class="liste_titre">
-				<th class="liste_titre">
-					Contacts
-				</th>
+				<th class="liste_titre">Contacts</th>
 				<th class="liste_titre" align="right">
 					<select id="groupe" class="flat minwidth200 select2-hidden-accessible" name="groupetest" tabindex="-1" aria-hidden="true">
-						<option value="test 1">test 1</option>
-						<option value="test 2">test 2</option>
+					
 					</select>
-					<span class="select2 select2-container select2-container--default" style ="width: 200px;">
+					<span class="select2 select2-container select2-container--default" style ="width: 200px; ">
 						<span class="selection">
 							<span class="select2-selection select2-selection--single flat minwidth200" role="combobox" aria-haspopup="true" tabindex="0" aria-labelledby="select2-group-container">
-							
-<!-- 								<span id="select2-group-container" class="select2-selection__rendered" title=""></span> -->
-<!-- 								<span class="select2-selection__arrow" role="presentation"> -->
-<!-- 									<b role="presentation"></b> -->
-<!-- 								</span> -->
+								<span id="select2-group-container" class="select2-selection__rendered" title="" style ="padding-right: 0px; ">
 
-								<!--   a modifier c'est pour un test 
-										ici afficher la liste de tous les contacts donc requette fetch all contact -->
-										
-								<select id="difficulte" name="difficulte">
-									<option value="facile">Facile</option>
-									<option value="moyenne">Moyenne</option>
-									<option value="difficile">Difficile</option>
-								</select>
-								
+<!-- 									<select id="listContact" name="listContact" > -->
+<!-- 										<option value="facile">Facile</option> -->
+<!-- 										<option value="moyenne">Moyenne</option> -->
+<!-- 										<option value="difficile">Difficile</option> -->
+<!-- 									</select> -->
+									[view.showContact;strconv=no]
+								</span>
 							</span>
 						</span>
 						<span class="dropdown-wrapper" aria-hidden="true"></span>
