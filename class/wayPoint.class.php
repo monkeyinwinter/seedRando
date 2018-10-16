@@ -203,7 +203,7 @@ class wayPoint extends SeedObject
 	{
 		global $db;
 		
-		$object = new WayPoint($db);
+		$object = new wayPoint($db);
 		$object->load($id, '',false);
 		
 		return $object->getNomUrl($withpicto);

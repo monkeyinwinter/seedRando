@@ -7,6 +7,9 @@ if (!class_exists('SeedObject'))
 	 */
 	define('INC_FROM_DOLIBARR', true);
 	require_once dirname(__FILE__).'/../config.php';
+	
+	dol_include_once('/seedrando/class/wayPoint.class.php');
+	dol_include_once('/seedrando/class/relationTable.class.php');
 }
 
 
@@ -39,6 +42,8 @@ class seedrando extends SeedObject
 	public $table_element = 'seedrando';
 
 	public $element = 'seedrando';
+	
+	public $TWaypoint = array();
 	
 	public function __construct($db)
 	{
@@ -81,7 +86,11 @@ class seedrando extends SeedObject
 			$this->withChild = $wc;
 		}
 		
-		$wayPoint = new WayPoint($this->db);
+		// TODO delete all relations
+		
+		
+		// TODO assoc relations
+		$wayPoint = new wayPoint($this->db);
 		
 		// Sauvegarde de tous lew waypoint si il y en @author thibault
 		if(!empty($this->wayPoint)) {
@@ -96,23 +105,60 @@ class seedrando extends SeedObject
 		return $res;
 	}
 	
+	public function loadWaypoints()
+	{
+		$this->TWaypoint = array();
+		
+		$sql = 'SELECT fk_wayPoint FROM '.MAIN_DB_PREFIX.'relationTable WHERE fk_seedRando = '.$this->id;
+				
+		$resql = $this->db->query($sql);
+
+		if ($resql)
+		{		
+			$count = 0;
+			while($return = $this->db->fetch_object($resql)){
+				
+				$way = new wayPoint($this->db);
+				
+				$way->load($return->fk_wayPoint, '');
+// 				var_dump($this->ref . ' tpotot');
+				$this->TWaypoint[] = $way;
+			}
+		}
+		return $TWaypoint;
+	}
 	
 	public function loadBy($value, $field, $annexe = false)
 	{
 		$res = parent::loadBy($value, $field, $annexe);
 		
+		$this->loadWaypoints();
+		
 		return $res;
 	}
 	
 	public function load($id, $ref, $loadChild = true)
-	{
+	{	
 		global $db;
 		
 		$res = parent::fetchCommon($id, $ref);
-		
-		if ($loadChild) $this->fetchObjectLinked();
-		
-		return $res;
+
+		if ($loadChild) 
+		{
+			
+			$sql = 'SELECT t.name';//requette pour permettre l'affichage des waypoints dans la creation de la rando
+			$sql.= ' FROM '.MAIN_DB_PREFIX.'wayPoint t WHERE rowid = ' .$res;
+			
+			$dataresult = $db->query($sql);
+			
+			$display = $db->fetch_object($dataresult);
+			
+// 			$display->name;
+			
+			//$this->fetchObjectLinked();
+		}
+// 		var_dump($display);
+		return $display;
 	}
 	
 	public function delete(User &$user)

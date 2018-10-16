@@ -40,6 +40,8 @@ $objectRandoContact = new relationRandoContact($db);
 if (!empty($id)) $object->load($id, '');
 elseif (!empty($ref)) $object->loadBy($ref, 'ref');
 
+
+
 $hookmanager->initHooks(array('seedrandocard', 'globalcard'));
 
 /*
@@ -172,10 +174,11 @@ print $TBS->render('tpl/card.tpl.php'
 						,'showRef' => ($action == 'create') ? $langs->trans('Draft') : $form->showrefnav($object, 'ref', $linkback, 1, 'ref', 'ref', '')
 						,'showLabel' => $formcore->texte('', 'label', $object->label, 80, 255)
 						,'showDistance' => $formcore->texte('', 'distance', $object->distance, 80, 255)
-						,'showWayPoint' => _get_showWayPoint($objectWayPoint, $TlistSelectWayPoint,  $mode, $id, $db)//modification pour utiliser la drop list difficulte
+						//,'showWayPoint' => _get_showWayPoint($objectWayPoint, $TlistSelectWayPoint,  $mode, $id, $db)//modification pour utiliser la drop list difficulte
+						,'showWayPoint' => _get_showWayPoint2($object, $mode)//modification pour utiliser la drop list difficulte
 						,'showDifficulte' => _get_showDifficulte($object, $selectDifficulte,  $mode)//modification pour utiliser la drop list difficulte
 						,'showContact' => _get_showContact($objectContact, $db)
-						,'showListContact' => _get_listContact($objectRandoContact, $db)
+						,'showListContact' => _get_listContact($objectRandoContact, $db, $id, $action)
 						,'showStatus' => $object->getLibStatut(1)
 				)
 				,'langs' => $langs
@@ -188,9 +191,73 @@ print $TBS->render('tpl/card.tpl.php'
 						,'STATUS_ACCEPTED' => seedrando::STATUS_ACCEPTED
 				)
 		)
-		);
+	);
+var_dump($mode);
+function _get_showWayPoint2($object, $mode)
+{
+	global $form;
+	
+	$html = '';
+	$object->loadWaypoints();
+	
+	$count = count($object->TWaypoint);
+	
+	echo $count;
+	
+	if ($mode == 'view')
+	{
+		for ($i = 0; $i<$count ;$i++)
+		{
+			$html .= $object->TWaypoint[$i]->name.' - ';
+		}
+	}
+	else// edit ou add
+	{
+		$TallWayPoint = array();
+		$TlistSelectWayPoint = array();
+		
+		if ($count > 0)
+		{
+			for ($i = 0; $i<$count ; $i++)
+			{
+				$TlistSelectWayPoint[] = $object->TWaypoint[$i]->id;
 
+			}
+			$TallWayPoint = get_multiselectarray($TlistSelectWayPoint, $objectWayPoint, $db);
+			$html = $form->multiselectarray('wayPoint', $TallWayPoint, $TlistSelectWayPoint);
+		}
+		else {
+			$temp = get_multiselectarray($TlistSelectWayPoint, $objectWayPoint, $db);
 
+			$html = $form->multiselectarray('wayPoint', $temp, $objectWayPoint->name);
+		}
+
+	}
+
+	return $html;
+}
+
+function get_multiselectarray ($TlistSelectWayPoint, $objectWayPoint, $db)
+{
+	global $form;
+	global $action;
+	global $id;
+	global $db;
+	
+	//recuperer laliste complete des wayPoints
+	$sql = 'SELECT t.rowid, t.name';//requette pour permettre l'affichage des waypoints dans la creation de la rando
+	$sql.= ' FROM '.MAIN_DB_PREFIX.'wayPoint t ';
+	
+	$dataresult = $db->query($sql);
+	
+	$TlistSelectWayPoint = array();
+	
+	while ($display = $db->fetch_object($dataresult)) {
+		$TlistSelectWayPoint[$display->rowid] =  $display->name;
+	}
+	
+	return $TlistSelectWayPoint;
+}
 
 function _get_showContact ($objectContact, $db)
 {
@@ -214,71 +281,74 @@ function _get_showContact ($objectContact, $db)
 	return $TlistSelectContact;
 }
 
-function _get_listContact($objectRandoContact, $db)
+function _get_listContact($objectRandoContact, $db, $id, $action)
 {
-	$sql = 'SELECT t.fk_socpeople_target';//requette pour permettre l'affichage des contacts dans les objets liès de la rando
-	$sql.= ' FROM '.MAIN_DB_PREFIX.'relationRandoContact t ';
 	
-	$dataresult = $db->query($sql);
-	$TlistContact = array();
-		
-	while ($add = $db->fetch_object($dataresult)) {
-		$TlistContact[] =  $add->fk_socpeople_target;
-	}
-	
-// 	j'ai recuperer les contacts de la table relationRandoContact
-	
-// 	j'itere sur mon tableau $TlistContact pour recuperer mes objets relationRandoContact
-
-	$stringOut = array();
-	
-	foreach ($TlistContact AS $value)
+	if ($action != "create" || $action != "edit")
 	{
-		$sql = 'SELECT t.firstname, t.lastname';//requette pour permettre l'affichage des relationRandoContact
-		$sql.= ' FROM '.MAIN_DB_PREFIX.'socpeople t ';
+		$result = "aucun";
+	}
+	else
+	{
+		$sql = 'SELECT t.fk_socpeople_target';//requette pour permettre l'affichage des contacts dans les objets liès de la rando
+		$sql .= ' FROM '.MAIN_DB_PREFIX.'relationRandoContact t ';
+		$sql .= ' WHERE fk_seedRando_source =  ' .$id;
+		
 		
 		$dataresult = $db->query($sql);
+		$TlistContact = array();
 		
-		$display = $db->fetch_object($dataresult);
+		while ($add = $db->fetch_object($dataresult)) {
+			$TlistContact[] =  $add->fk_socpeople_target;
+		}
 		
-		$stringOut[] = $display->firstname ." ". $display->lastname;
+		// 	j'ai recuperer les contacts de la table relationRandoContact
+		
+		// 	j'itere sur mon tableau $TlistContact pour recuperer mes objets relationRandoContact
+		
+		$stringOut = array();
+		
+		foreach ($TlistContact AS $value)
+		{
+			$sql = 'SELECT t.firstname, t.lastname';//requette pour permettre l'affichage des relationRandoContact
+			$sql.= ' FROM '.MAIN_DB_PREFIX.'socpeople t ';
+			
+			$dataresult = $db->query($sql);
+			
+			$display = $db->fetch_object($dataresult);
+			
+			$stringOut[] = $display->firstname ." ". $display->lastname;
+		}
+		$result = implode("<br>", $stringOut);
+		
 	}
+
 	
 // 	var_dump($stringOut);
-	return implode("<br>", $stringOut);
+	return $result;
 }
 
-
-
-
-
-
-
-
-
-
-function _get_showWayPoint($objectWayPoint, $TlistSelectWayPoint, $mode = 'view', $id, $db)
-{
-	global $form;
+// function _get_showWayPoint($objectWayPoint, $TlistSelectWayPoint, $mode = 'view', $id, $db)
+// {
+// 	global $form;
+// 	$object = new seedrando($db);
 	
-	$test = 'tottoo';
-	
-	if(!empty($id))
-	{
-		if($mode == 'view')
-		{
-			$test = get_stringOut($id, $db);
-			return $test;
-		}
-		elseif ($mode == 'edit')
-		{
-			$test = get_multiselectarray($TlistSelectWayPoint, $objectWayPoint, $db);
-			return $test;
+// 	if(!empty($id))
+// 	{
+// 		if($mode == 'view')
+// 		{
+// 			$test = get_stringOut($id, $db);
+// 			return $test;
+// 		}
+// 		elseif ($mode == 'edit')
+// 		{
+// 			$test = get_multiselectarray($TlistSelectWayPoint, $objectWayPoint, $db);
+// 			return $test;
 			
-		}
-	}
-	return;
-}
+// 		}
+// 	}
+// 	return;
+// }
 
 function _get_showDifficulte($object, $selectDifficulte, $mode = 'view')
 {
@@ -295,59 +365,39 @@ function _get_showDifficulte($object, $selectDifficulte, $mode = 'view')
 	return '';
 }
 
-function get_multiselectarray ($TlistSelectWayPoint, $objectWayPoint, $db)
-{
-	global $form;
-	global $action;
-	global $id;
-	
-	//recuperer laliste complete des wayPoints
-	$sql = 'SELECT t.rowid, t.name';//requette pour permettre l'affichage des waypoints dans la creation de la rando
-	$sql.= ' FROM '.MAIN_DB_PREFIX.'wayPoint t ';
-	
-	$dataresult = $db->query($sql);
-	
-	$TlistSelectWayPoint = array();
-	
-	while ($display = $db->fetch_object($dataresult)) {
-		$TlistSelectWayPoint[$display->rowid] =  $display->name;
-	}
-	
-	$test = $form->multiselectarray('wayPoint', $TlistSelectWayPoint, $objectWayPoint->name); //modification pour utiliser la drop list difficulte
-	return $test;
-}
 
-function get_stringOut($id, $db)
-{
-	$sql = 'SELECT t.fk_wayPoint';//requette pour permettre l'affichage des waypoints dans la creation de la rando
-	$sql .= ' FROM '.MAIN_DB_PREFIX.'relationTable t ';
-	$sql .= ' WHERE fk_seedRando =  ' .$id;
+
+// function get_stringOut($id, $db)
+// {
+// 	$sql = 'SELECT t.fk_wayPoint';//requette pour permettre l'affichage des waypoints dans la creation de la rando
+// 	$sql .= ' FROM '.MAIN_DB_PREFIX.'relationTable t ';
+// 	$sql .= ' WHERE fk_seedRando =  ' .$id;
 	
-	$dataresult = $db->query($sql);
+// 	$dataresult = $db->query($sql);
 	
-	$TlistOfMyWayPoint = array();
+// 	$TlistOfMyWayPoint = array();
 	
-	while ($display = $db->fetch_object($dataresult)) {
+// 	while ($display = $db->fetch_object($dataresult)) {
 		
-		$TlistOfMyWayPoint[] = $display->fk_wayPoint;
-	}
-	//j'ai recuperer les fk_wayPoint de la table relationTable
+// 		$TlistOfMyWayPoint[] = $display->fk_wayPoint;
+// 	}
+// 	//j'ai recuperer les fk_wayPoint de la table relationTable
 	
-	//j'itere sur mon tableau $listOfMyWayPoint pour recuperer mes objets wayPoint
-	$stringOut = array();
-	foreach ($TlistOfMyWayPoint AS $value)
-	{
-		$sql = 'SELECT t.name';//requette pour permettre l'affichage des waypoints dans la creation de la rando
-		$sql.= ' FROM '.MAIN_DB_PREFIX.'wayPoint t WHERE rowid = ' .$value;
+// 	//j'itere sur mon tableau $listOfMyWayPoint pour recuperer mes objets wayPoint
+// 	$stringOut = array();
+// 	foreach ($TlistOfMyWayPoint AS $value)
+// 	{
+// 		$sql = 'SELECT t.name';//requette pour permettre l'affichage des waypoints dans la creation de la rando
+// 		$sql.= ' FROM '.MAIN_DB_PREFIX.'wayPoint t WHERE rowid = ' .$value;
 		
-		$dataresult = $db->query($sql);
+// 		$dataresult = $db->query($sql);
 		
-		$display = $db->fetch_object($dataresult);
+// 		$display = $db->fetch_object($dataresult);
 		
-		$stringOut[] = $display->name;
-	}
-	return implode(", ", $stringOut);
-}
+// 		$stringOut[] = $display->name;
+// 	}
+// 	return implode(", ", $stringOut);
+// }
 
 
 if ($mode == 'edit') echo $formcore->end_form();

@@ -2,6 +2,7 @@
 
 require 'config.php';
 dol_include_once('/seedrando/class/seedrando.class.php');
+dol_include_once('/seedrando/class/wayPoint.class.php');
 
 if(empty($user->rights->seedrando->read)) accessforbidden();
 
