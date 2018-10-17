@@ -10,6 +10,7 @@ if (!class_exists('SeedObject'))
 	
 	dol_include_once('/seedrando/class/wayPoint.class.php');
 	dol_include_once('/seedrando/class/relationTable.class.php');
+	dol_include_once('../contact/class/contact.class.php');
 }
 
 
@@ -45,6 +46,8 @@ class seedrando extends SeedObject
 	
 	public $TWaypoint = array();
 	
+	public $TContact = array();
+	
 	public function __construct($db)
 	{
 		global $conf,$langs;
@@ -69,17 +72,12 @@ class seedrando extends SeedObject
 	public function save($addprov=false)
 	{
 		global $user;
-		
 		if (!$this->id) $this->fk_user_author = $user->id;
-		
 		$res = $this->id>0 ? $this->updateCommon($user) : $this->createCommon($user);
-		
 		if ($addprov || !empty($this->is_clone))
 		{
 			$this->ref = '(PROV'.$this->id.')';
-			
 			if (!empty($this->is_clone)) $this->status = self::STATUS_DRAFT;
-			
 			$wc = $this->withChild;
 			$this->withChild = false;
 			$res = $this->id>0 ? $this->updateCommon($user) : $this->createCommon($user);
@@ -92,74 +90,133 @@ class seedrando extends SeedObject
 		// TODO assoc relations
 		$wayPoint = new wayPoint($this->db);
 		
-		// Sauvegarde de tous lew waypoint si il y en @author thibault
-		if(!empty($this->wayPoint)) {
+		if(!empty($this->wayPoint)) {// Sauvegarde de tous les waypoints si il y en @author thibault
 			foreach($this->wayPoint as $value) {
+				
 				$In = new relationTable($this->db);
 				$In -> fk_seedRando = $this->id;
 				$In -> fk_wayPoint = $value;
-				$In -> create($user);
+				
+				$sql = 'SELECT fk_wayPoint FROM ' .MAIN_DB_PREFIX. 'relationTable ';
+				$sql .= 'WHERE fk_wayPoint = ' . $value;
+				$sql .= ' and fk_seedRando = ' . $this->id;
+				
+				$test = array();
+				$test[] = $this->db->query($sql);
+				
+				if ($test[0]->num_rows > 0)
+				{
+					//echo 'present dans la liste !!';
+				}
+				else
+				{
+					$In -> create($user);//echo 'absent dans la liste';
+				}
 			}
 		}
-		
 		return $res;
+	}
+	
+	public function saveContact($addprov=false)
+	{
+		
+		$sql = 'SELECT fk_socpeople_target FROM ' .MAIN_DB_PREFIX. 'relationRandoContact ';
+		$sql .= 'WHERE fk_socpeople_target = ' . $this->listSelectContact;
+		$sql .= ' and fk_seedRando_source = ' . $this->id;
+		
+		$test = $this->db->query($sql);
+		
+		if ($test->num_rows > 0)
+		{
+			// echo 'present dans la liste !!';
+		}
+		else// echo 'absent dans la liste';
+		{
+			$sql = 'INSERT INTO ' .MAIN_DB_PREFIX. 'relationRandoContact (fk_seedRando_source, fk_socpeople_target)';
+			$sql .= 'VALUES ('.$this->id.','.$this->listSelectContact.')';	
+			$this->db->query($sql);
+		}
 	}
 	
 	public function loadWaypoints()
 	{
 		$this->TWaypoint = array();
-		
 		$sql = 'SELECT fk_wayPoint FROM '.MAIN_DB_PREFIX.'relationTable WHERE fk_seedRando = '.$this->id;
-				
 		$resql = $this->db->query($sql);
-
 		if ($resql)
 		{		
-			$count = 0;
 			while($return = $this->db->fetch_object($resql)){
-				
 				$way = new wayPoint($this->db);
-				
 				$way->load($return->fk_wayPoint, '');
-// 				var_dump($this->ref . ' tpotot');
 				$this->TWaypoint[] = $way;
 			}
 		}
+// 		var_dump($TWaypoint);
 		return $TWaypoint;
 	}
 	
 	public function loadBy($value, $field, $annexe = false)
 	{
 		$res = parent::loadBy($value, $field, $annexe);
-		
 		$this->loadWaypoints();
-		
 		return $res;
 	}
 	
 	public function load($id, $ref, $loadChild = true)
 	{	
 		global $db;
-		
 		$res = parent::fetchCommon($id, $ref);
-
 		if ($loadChild) 
 		{
-			
 			$sql = 'SELECT t.name';//requette pour permettre l'affichage des waypoints dans la creation de la rando
 			$sql.= ' FROM '.MAIN_DB_PREFIX.'wayPoint t WHERE rowid = ' .$res;
-			
 			$dataresult = $db->query($sql);
-			
 			$display = $db->fetch_object($dataresult);
-			
-// 			$display->name;
-			
-			//$this->fetchObjectLinked();
 		}
-// 		var_dump($display);
 		return $display;
 	}
+		
+	public function loadContacts()
+	{
+		$TtempContact = array();
+		$sql = 'SELECT fk_socpeople_target FROM '.MAIN_DB_PREFIX.'relationRandoContact WHERE fk_seedRando_source = '.$this->id;
+		$resql = $this->db->query($sql);
+		
+		if ($resql)
+		{
+			while($return = $this->db->fetch_object($resql)){
+				$contact = new contact($this->db);
+				$contact->fetch($return->fk_socpeople_target, '');
+				$this->TContact[] = $contact;
+			}
+		}
+// 		var_dump($TContact);
+		return $TContact;
+	}
+	
+	public function loadByContact($value, $field, $annexe = false)
+	{
+		$res = parent::loadBy($value, $field, $annexe);
+		$this->loadContacts();
+		return $res;
+	}
+	
+	public function loadContact($id, $ref, $loadChild = true)
+	{
+		global $db;
+		$res = parent::fetchCommon($id, $ref);
+		if ($loadChild)
+		{
+			$sql = 'SELECT t.firstname t.lastname';//requette pour permettre l'affichage des waypoints dans la creation de la rando
+			$sql.= ' FROM '.MAIN_DB_PREFIX.'socpeople t WHERE rowid = ' .$res;
+			$dataresult = $db->query($sql);
+			$display = $db->fetch_object($dataresult);
+		}
+		return $display;
+	}
+	
+	
+	
 	
 	public function delete(User &$user)
 	{

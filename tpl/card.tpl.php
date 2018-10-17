@@ -88,11 +88,6 @@
 	[onshow;block=end]
 </div>
 
-
-
-
-
-
 <table summary="" class="centpercent notopnoleftnoright showlinkedobjectblock" style="margin-bottom: 2px;">
 	<tr>
 		<td class="nobordernopadding" valign="middle">
@@ -101,27 +96,18 @@
 	</tr>
 </table>
 
-<form action="xxxxxxxxxxxxxxxx" method="POST">
-	<input name="xxxxxxx" type="hidden">
-	<input name="action" type="hidden">
+<form action="http://localhost/dolibarr/htdocs/custom/seedrando/card.php?id=[object.id]" method="POST">
+	<input name="action" type="hidden" value="saveContact">
 	<table class="noborder" width="100%">
 		<tbody>
 			<tr class="liste_titre">
 				<th class="liste_titre">Contacts</th>
 				<th class="liste_titre" align="right">
-					<select id="groupe" class="flat minwidth200 select2-hidden-accessible" name="groupetest" tabindex="-1" aria-hidden="true">
-					
-					</select>
+					<select id="groupe" class="flat minwidth200 select2-hidden-accessible" name="groupetest" tabindex="-1" aria-hidden="true"></select>
 					<span class="select2 select2-container select2-container--default" style ="width: 200px; ">
 						<span class="selection">
 							<span class="select2-selection select2-selection--single flat minwidth200" role="combobox" aria-haspopup="true" tabindex="0" aria-labelledby="select2-group-container">
 								<span id="select2-group-container" class="select2-selection__rendered" title="" style ="padding-right: 0px; ">
-
-<!-- 									<select id="listContact" name="listContact" > -->
-<!-- 										<option value="facile">Facile</option> -->
-<!-- 										<option value="moyenne">Moyenne</option> -->
-<!-- 										<option value="difficile">Difficile</option> -->
-<!-- 									</select> -->
 									[view.showContact;strconv=no]
 								</span>
 							</span>
@@ -139,7 +125,6 @@
 					<div id="test">
 						[view.showListContact;strconv=no]
 					</div>
-					Aucun
 				</td>
 			</tr>
 		</tbody>
