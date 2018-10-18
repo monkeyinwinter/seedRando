@@ -83,16 +83,28 @@ class seedrando extends SeedObject
 			$res = $this->id>0 ? $this->updateCommon($user) : $this->createCommon($user);
 			$this->withChild = $wc;
 		}
-		
-		// TODO delete all relations
-		
-		
-		// TODO assoc relations
-		$wayPoint = new wayPoint($this->db);
-		
-		if(!empty($this->wayPoint)) {// Sauvegarde de tous les waypoints si il y en @author thibault
-			foreach($this->wayPoint as $value) {
-				
+
+		$this->loadWaypoints();
+
+		$count = count($this->TWaypoint);
+
+		if(!empty($this->wayPoint))// Sauvegarde de tous les waypoints si il y en @author thibault
+		{
+			foreach($this->wayPoint as $value)
+			{
+				//si donnée present dans this->TWaypoint et present dans this->wayPoint alors save sinon delete
+				for ($t = 0 ; $t < $count ; $t++)
+				{
+					if(!in_array($this->TWaypoint[$t]->id, $this->wayPoint))
+					{
+						//echo 'on supprime';//on supprime la valeur dans la table relationnel
+						$sqlDelete = 'DELETE FROM ' .MAIN_DB_PREFIX. 'relationTable';
+						$sqlDelete .= ' WHERE fk_seedRando = '.$this->id;
+						$sqlDelete .= ' AND fk_wayPoint = '.$this->TWaypoint[$t]->id;
+						$this->db->query($sqlDelete);
+					}
+				}
+			
 				$In = new relationTable($this->db);
 				$In -> fk_seedRando = $this->id;
 				$In -> fk_wayPoint = $value;
@@ -114,6 +126,10 @@ class seedrando extends SeedObject
 				}
 			}
 		}
+// 		else
+// 		{
+// 			//c est vide il faut vider la table de ces relations avec la rando
+// 		}
 		return $res;
 	}
 	
