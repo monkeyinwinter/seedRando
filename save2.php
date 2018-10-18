@@ -310,3 +310,77 @@ if ($mode == 'edit') echo $formcore->end_form();
 
 
 llxFooter();
+
+
+
+
+
+
+
+
+if(!empty($this->wayPoint))// Sauvegarde de tous les waypoints si il y en @author thibault
+{
+	foreach($this->wayPoint as $value)
+	{
+		//si donnée present dans this->TWaypoint et present dans this->wayPoint alors save sinon delete
+		for ($t = 0 ; $t < $count ; $t++)
+		{
+			if(!in_array($this->TWaypoint[$t]->id, $this->wayPoint))
+			{
+				$id = $this->id;
+				$idToDelete = $this->TWaypoint[$t]->id;
+				
+				$this->deleteWayPoint($id, $idToDelete, '');
+				// 						//echo 'on supprime';//on supprime la valeur dans la table relationnel
+				// 						$sqlDelete = 'DELETE FROM ' .MAIN_DB_PREFIX. 'relationTable';
+				// 						$sqlDelete .= ' WHERE fk_seedRando = '.$this->id;
+				// 						$sqlDelete .= ' AND fk_wayPoint = '.$this->TWaypoint[$t]->id;
+				// 						$this->db->query($sqlDelete);
+			}
+		}
+		
+		$In = new relationTable($this->db);
+		$In -> fk_seedRando = $this->id;
+		$In -> fk_wayPoint = $value;
+		
+		$sql = 'SELECT fk_wayPoint FROM ' .MAIN_DB_PREFIX. 'relationTable ';
+		$sql .= 'WHERE fk_wayPoint = ' . $value;
+		$sql .= ' and fk_seedRando = ' . $this->id;
+		
+		$test = array();
+		$test[] = $this->db->query($sql);
+		
+		if ($test[0]->num_rows > 0)
+		{
+			//echo 'present dans la liste !!';
+		}
+		else
+		{
+			$In -> create($user);//echo 'absent dans la liste';
+		}
+	}
+}
+else
+{
+	//c est vide il faut vider la table de ces relations avec la rando
+	$id = $this->id;
+	$all = 'all';
+	
+	$this->deleteWayPoint($id, '' , $all);
+}
+return $res;
+}
+
+public function deleteWayPoint($id, $idToDelete, $all = '')
+{
+	$sqlDelete = 'DELETE FROM ' .MAIN_DB_PREFIX. 'relationTable';
+	$sqlDelete .= ' WHERE fk_seedRando = '.$id;
+	
+	if ($all != 'all' )
+	{
+		$sqlDelete .= ' AND fk_wayPoint = '.$idToDelete;
+	}
+	$this->db->query($sqlDelete);
+}
+
+

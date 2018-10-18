@@ -88,6 +88,15 @@ class seedrando extends SeedObject
 
 		$count = count($this->TWaypoint);
 
+		
+// 		if(empty($this->wayPoint) )
+// 		{
+// 			$sqlDelete2 = 'DELETE FROM ' .MAIN_DB_PREFIX. 'relationTable';
+// 			$sqlDelete2 .= ' WHERE fk_seedRando = '.$this->id;
+// 			$this->db->query($sqlDelete2);
+// 		}
+		
+		
 		if(!empty($this->wayPoint))// Sauvegarde de tous les waypoints si il y en @author thibault
 		{
 			foreach($this->wayPoint as $value)
@@ -97,7 +106,7 @@ class seedrando extends SeedObject
 				{
 					if(!in_array($this->TWaypoint[$t]->id, $this->wayPoint))
 					{
-						//echo 'on supprime';//on supprime la valeur dans la table relationnel
+						echo 'on supprime';//on supprime la valeur dans la table relationnel
 						$sqlDelete = 'DELETE FROM ' .MAIN_DB_PREFIX. 'relationTable';
 						$sqlDelete .= ' WHERE fk_seedRando = '.$this->id;
 						$sqlDelete .= ' AND fk_wayPoint = '.$this->TWaypoint[$t]->id;
@@ -128,7 +137,10 @@ class seedrando extends SeedObject
 		}
 // 		else
 // 		{
-// 			//c est vide il faut vider la table de ces relations avec la rando
+// 			$sqlDelete2 = 'DELETE FROM ' .MAIN_DB_PREFIX. 'relationTable';
+// 			$sqlDelete2 .= ' WHERE fk_seedRando = '.$this->id;
+// 			$this->db->query($sqlDelete2);
+// 			echo $sqlDelete2;exit;
 // 		}
 		return $res;
 	}
