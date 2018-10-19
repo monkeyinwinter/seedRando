@@ -46,6 +46,8 @@ class seedrando extends SeedObject
 	
 	public $TWaypoint = array();
 	
+	public $Ttemp = array();
+	
 	public $TContact = array();
 	
 	public function __construct($db)
@@ -83,7 +85,33 @@ class seedrando extends SeedObject
 			$res = $this->id>0 ? $this->updateCommon($user) : $this->createCommon($user);
 			$this->withChild = $wc;
 		}
+		
+		$this->UpdateOrSaveWay();
 
+		$action = GETPOST('action');
+	
+		if($action == 'save')
+		{
+			if(empty($this->wayPoint))
+			{
+				$this->deleteWay();
+			}
+		}
+
+		
+		return $res;
+	}
+	
+	public function deleteWay()
+	{
+		$sqlDelete2 = 'DELETE FROM ' .MAIN_DB_PREFIX. 'relationTable';
+		$sqlDelete2 .= ' WHERE fk_seedRando = '.$this->id;
+		$this->db->query($sqlDelete2);
+	}
+	
+	public function UpdateOrSaveWay()
+	{
+		global $user;
 		$this->loadWaypoints();
 
 		$count = count($this->TWaypoint);
@@ -97,52 +125,30 @@ class seedrando extends SeedObject
 				{
 					if(!in_array($this->TWaypoint[$t]->id, $this->wayPoint))
 					{
-						echo 'on supprime';//on supprime la valeur dans la table relationnel
+						//on supprime la valeur dans la table relationnel
 						$sqlDelete = 'DELETE FROM ' .MAIN_DB_PREFIX. 'relationTable';
 						$sqlDelete .= ' WHERE fk_seedRando = '.$this->id;
 						$sqlDelete .= ' AND fk_wayPoint = '.$this->TWaypoint[$t]->id;
 						$this->db->query($sqlDelete);
 					}
 				}
-			
+				
 				$In = new relationTable($this->db);
 				$In -> fk_seedRando = $this->id;
 				$In -> fk_wayPoint = $value;
-				
+			
 				$sql = 'SELECT fk_wayPoint FROM ' .MAIN_DB_PREFIX. 'relationTable ';
 				$sql .= 'WHERE fk_wayPoint = ' . $value;
 				$sql .= ' and fk_seedRando = ' . $this->id;
 				
-				$test = array();
-				$test[] = $this->db->query($sql);
-				
-				if ($test[0]->num_rows > 0)
-				{
-					//echo 'present dans la liste !!';
-				}
-				else
+				$res = $this->db->query($sql);
+
+				if ($this->db->num_rows($res) == 0)
 				{
 					$In -> create($user);//echo 'absent dans la liste';
 				}
 			}
 		}
-		
-// 		if(empty($this->wayPoint) )
-// 			{
-// 				$sqlDelete2 = 'DELETE FROM ' .MAIN_DB_PREFIX. 'relationTable';
-// 				$sqlDelete2 .= ' WHERE fk_seedRando = '.$this->id;
-// 				$this->db->query($sqlDelete2);
-// 			}
-			
-			
-// 		else
-// 		{
-// 			$sqlDelete2 = 'DELETE FROM ' .MAIN_DB_PREFIX. 'relationTable';
-// 			$sqlDelete2 .= ' WHERE fk_seedRando = '.$this->id;
-// 			$this->db->query($sqlDelete2);
-// 			echo $sqlDelete2;exit;
-// 		}
-		return $res;
 	}
 	
 	public function saveContact($addprov=false)
@@ -169,7 +175,7 @@ class seedrando extends SeedObject
 	public function loadWaypoints()
 	{
 		$this->TWaypoint = array();
-		$sql = 'SELECT fk_wayPoint FROM '.MAIN_DB_PREFIX.'relationTable WHERE fk_seedRando = '.$this->id;
+		$sql = 'SELECT fk_wayPoint, rowid FROM '.MAIN_DB_PREFIX.'relationTable WHERE fk_seedRando = '.$this->id;
 		$resql = $this->db->query($sql);
 		if ($resql)
 		{		
@@ -179,14 +185,12 @@ class seedrando extends SeedObject
 				$this->TWaypoint[] = $way;
 			}
 		}
-// 		var_dump($TWaypoint);
 		return $TWaypoint;
 	}
 	
 	public function loadBy($value, $field, $annexe = false)
 	{
 		$res = parent::loadBy($value, $field, $annexe);
-		$this->loadWaypoints();
 		return $res;
 	}
 	
@@ -197,10 +201,6 @@ class seedrando extends SeedObject
 		if ($loadChild) 
 		{
 			$this->fetchObjectLinked();
-// 			$sql = 'SELECT t.name, t.ref';//requette pour permettre l'affichage des waypoints dans la creation de la rando
-// 			$sql.= ' FROM '.MAIN_DB_PREFIX.'wayPoint t WHERE rowid = ' .$res;
-// 			$dataresult = $db->query($sql);
-// 			$display = $db->fetch_object($dataresult);
 		}
 		return $res;
 	}

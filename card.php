@@ -41,6 +41,8 @@ $objectRandoContact = new relationRandoContact($db);
 if (!empty($id)) $object->load($id, '');
 elseif (!empty($ref)) $object->loadBy($ref, 'ref');
 
+$object->loadWaypoints();
+
 $hookmanager->initHooks(array('seedrandocard', 'globalcard'));
 
 /*
@@ -59,7 +61,7 @@ if (empty($reshook))
 		case 'save':
 
 			$object->setValues($_REQUEST); // Set standard attributes
-// 			var_dump($_REQUEST);exit;
+// 			var_dump($_REQUEST, $object);exit;
 			//			$object->date_other = dol_mktime(GETPOST('starthour'), GETPOST('startmin'), 0, GETPOST('startmonth'), GETPOST('startday'), GETPOST('startyear'));
 			
 			// Check parameters
@@ -70,13 +72,16 @@ if (empty($reshook))
 			//			}
 			
 			// ...
+// 			$object->set_TWay();
 			
 			if ($error > 0)
 			{
 				$mode = 'edit';
 				break;
 			}
-			
+			//$object->wayPoint=array(3,5,7)
+			//var_dump($object->wayPoint);exit;
+			//$object->wayPoint=$object->TwayPoint;
 			$object->save(empty($object->ref));
 			
 			header('Location: '.dol_buildpath('/seedrando/card.php', 1).'?id='.$object->id);
@@ -92,7 +97,10 @@ if (empty($reshook))
 			if (!empty($user->rights->seedrando->write)) $object->setDraft();
 			break;
 		case 'confirm_validate':
-			if (!empty($user->rights->seedrando->write)) $object->setValid();
+			if (!empty($user->rights->seedrando->write)) {
+				//$object->wayPoint=$object->TwayPoint;
+				$object->setValid();
+			}
 			
 			header('Location: '.dol_buildpath('/seedrando/card.php', 1).'?id='.$object->id);
 			exit;
