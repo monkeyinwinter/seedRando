@@ -123,7 +123,9 @@
 				
 				<td class="opacitymedium" colspan="3">
 					<div id="test">
-						[view.showListContact;strconv=no]
+						<tr>
+							<td>[view.showListContact;strconv=no]</td>
+						</tr>
 					</div>
 				</td>
 			</tr>

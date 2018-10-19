@@ -16,8 +16,6 @@ if(empty($user->rights->seedrando->read)) accessforbidden();
 
 $langs->load('seedrando@seedrando');
 
-// $TreturnRelationTable = GETPOST('wayPoint');
-
 $action = GETPOST('action');
 $id = GETPOST('id', 'int');
 $ref = GETPOST('ref');
@@ -27,8 +25,6 @@ $ref = GETPOST('ref');
 
 
 $saveContact = GETPOST('saveContact');
-
-
 
 $mode = 'view';
 if (empty($user->rights->seedrando->write)) $mode = 'view'; // Force 'view' mode if can't edit object

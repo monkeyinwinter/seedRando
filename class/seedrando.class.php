@@ -87,15 +87,6 @@ class seedrando extends SeedObject
 		$this->loadWaypoints();
 
 		$count = count($this->TWaypoint);
-
-		
-// 		if(empty($this->wayPoint) )
-// 		{
-// 			$sqlDelete2 = 'DELETE FROM ' .MAIN_DB_PREFIX. 'relationTable';
-// 			$sqlDelete2 .= ' WHERE fk_seedRando = '.$this->id;
-// 			$this->db->query($sqlDelete2);
-// 		}
-		
 		
 		if(!empty($this->wayPoint))// Sauvegarde de tous les waypoints si il y en @author thibault
 		{
@@ -135,6 +126,15 @@ class seedrando extends SeedObject
 				}
 			}
 		}
+		
+// 		if(empty($this->wayPoint) )
+// 			{
+// 				$sqlDelete2 = 'DELETE FROM ' .MAIN_DB_PREFIX. 'relationTable';
+// 				$sqlDelete2 .= ' WHERE fk_seedRando = '.$this->id;
+// 				$this->db->query($sqlDelete2);
+// 			}
+			
+			
 // 		else
 // 		{
 // 			$sqlDelete2 = 'DELETE FROM ' .MAIN_DB_PREFIX. 'relationTable';
@@ -196,12 +196,13 @@ class seedrando extends SeedObject
 		$res = parent::fetchCommon($id, $ref);
 		if ($loadChild) 
 		{
-			$sql = 'SELECT t.name';//requette pour permettre l'affichage des waypoints dans la creation de la rando
-			$sql.= ' FROM '.MAIN_DB_PREFIX.'wayPoint t WHERE rowid = ' .$res;
-			$dataresult = $db->query($sql);
-			$display = $db->fetch_object($dataresult);
+			$this->fetchObjectLinked();
+// 			$sql = 'SELECT t.name, t.ref';//requette pour permettre l'affichage des waypoints dans la creation de la rando
+// 			$sql.= ' FROM '.MAIN_DB_PREFIX.'wayPoint t WHERE rowid = ' .$res;
+// 			$dataresult = $db->query($sql);
+// 			$display = $db->fetch_object($dataresult);
 		}
-		return $display;
+		return $res;
 	}
 		
 	public function loadContacts()

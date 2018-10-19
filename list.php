@@ -96,7 +96,7 @@ echo $r->render($sql, array(
 	,'eval'=>array(
 		'ref' => '_getObjectNomUrl(\'@val@\')'
 //		,'fk_user' => '_getUserNomUrl(@val@)' // Si on a un fk_user dans notre requête
-		,'wayPoint' => '_printWayPoint("@val@")'//envoi vers methode qui retourne une string, ne pas oublier les doubles codes autour d'eval
+//		,'wayPoint' => '_printWayPoint("@val@")'//envoi vers methode qui retourne une string, ne pas oublier les doubles codes autour d'eval
 	)
 ));
 
