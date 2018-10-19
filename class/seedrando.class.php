@@ -87,18 +87,14 @@ class seedrando extends SeedObject
 		}
 		
 		$this->UpdateOrSaveWay();
-
-		$action = GETPOST('action');
 	
-		if($action == 'save')
+		if(GETPOST('action') == 'save')
 		{
 			if(empty($this->wayPoint))
 			{
 				$this->deleteWay();
 			}
 		}
-
-		
 		return $res;
 	}
 	
@@ -158,14 +154,11 @@ class seedrando extends SeedObject
 		$sql .= 'WHERE fk_socpeople_target = ' . $this->listSelectContact;
 		$sql .= ' and fk_seedRando_source = ' . $this->id;
 		
-		$test = $this->db->query($sql);
+		$res = $this->db->query($sql);
 		
-		if ($test->num_rows > 0)
+		if ($this->db->num_rows($res) == 0)
 		{
 			// echo 'present dans la liste !!';
-		}
-		else// echo 'absent dans la liste';
-		{
 			$sql = 'INSERT INTO ' .MAIN_DB_PREFIX. 'relationRandoContact (fk_seedRando_source, fk_socpeople_target)';
 			$sql .= 'VALUES ('.$this->id.','.$this->listSelectContact.')';	
 			$this->db->query($sql);
