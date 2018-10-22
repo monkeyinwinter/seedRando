@@ -92,56 +92,77 @@ class seedrando extends SeedObject
 		{
 			if(empty($this->wayPoint))
 			{
-				$this->deleteWay();
+				//$this->deleteWay();
+				$this->deleteRelation('relationTable', 'fk_seedRando_source');
 			}
 		}
 		return $res;
 	}
+
 	
-	public function deleteWay()
+	public function deleteRelation($TableRelation, $fk_source, $fk_target = '', $idContact = '')
 	{
-		$sqlDelete2 = 'DELETE FROM ' .MAIN_DB_PREFIX. 'relationTable';
-		$sqlDelete2 .= ' WHERE fk_seedRando = '.$this->id;
+		$sqlDelete2 = 'DELETE FROM ' . MAIN_DB_PREFIX . $TableRelation;
+		$sqlDelete2 .= ' WHERE ' . $fk_source .' = '.$this->id;
+		if($fk_target != '')
+		{
+			$sqlDelete2 .= ' AND ' . $fk_target .' = ' .$idContact;
+		}
 		$this->db->query($sqlDelete2);
 	}
+	
+	
+// 	public function deleteWay()
+// 	{
+// 		$sqlDelete2 = 'DELETE FROM ' .MAIN_DB_PREFIX. 'relationTable';
+// 		$sqlDelete2 .= ' WHERE fk_seedRando_source = '.$this->id;
+// 		$this->db->query($sqlDelete2);
+// 	}
+	
+// 	public function deleteContact($idContact)
+// 	{
+// 		$sqlDelete2 = 'DELETE FROM ' .MAIN_DB_PREFIX. 'relationRandoContact';
+// 		$sqlDelete2 .= ' WHERE fk_seedRando_source = '.$this->id;
+// 		$sqlDelete2 .= ' AND fk_socpeople_target = ' .$idContact;
+// 		$this->db->query($sqlDelete2);
+// 	}
 	
 	public function UpdateOrSaveWay()
 	{
 		global $user;
-		$this->loadWaypoints();
+		$this->loadRelation('TWaypoint', 'fk_wayPoint_target', 'relationTable', 'fk_seedRando_source', 'wayPoint', '$TWaypoint', 'load');
 
 		$count = count($this->TWaypoint);
 		
-		if(!empty($this->wayPoint))// Sauvegarde de tous les waypoints si il y en @author thibault
+		if(!empty($this->wayPoint))// Sauvegarde de tous les waypoints
 		{
 			foreach($this->wayPoint as $value)
 			{
-				//si donnée present dans this->TWaypoint et present dans this->wayPoint alors save sinon delete
-				for ($t = 0 ; $t < $count ; $t++)
+				for ($t = 0 ; $t < $count ; $t++)//si donnée present dans this->TWaypoint et present dans this->wayPoint alors save sinon delete
 				{
 					if(!in_array($this->TWaypoint[$t]->id, $this->wayPoint))
 					{
 						//on supprime la valeur dans la table relationnel
 						$sqlDelete = 'DELETE FROM ' .MAIN_DB_PREFIX. 'relationTable';
-						$sqlDelete .= ' WHERE fk_seedRando = '.$this->id;
-						$sqlDelete .= ' AND fk_wayPoint = '.$this->TWaypoint[$t]->id;
+						$sqlDelete .= ' WHERE fk_seedRando_source = '.$this->id;
+						$sqlDelete .= ' AND fk_wayPoint_target = '.$this->TWaypoint[$t]->id;
 						$this->db->query($sqlDelete);
 					}
 				}
 				
 				$In = new relationTable($this->db);
-				$In -> fk_seedRando = $this->id;
-				$In -> fk_wayPoint = $value;
+				$In -> fk_seedRando_source = $this->id;
+				$In -> fk_wayPoint_target = $value;
 			
-				$sql = 'SELECT fk_wayPoint FROM ' .MAIN_DB_PREFIX. 'relationTable ';
-				$sql .= 'WHERE fk_wayPoint = ' . $value;
-				$sql .= ' and fk_seedRando = ' . $this->id;
+				$sql = 'SELECT fk_wayPoint_target FROM ' .MAIN_DB_PREFIX. 'relationTable ';//remplacer la requette par interogation du $this->TWaypoint
+				$sql .= 'WHERE fk_wayPoint_target = ' . $value;
+				$sql .= ' and fk_seedRando_source = ' . $this->id;
 				
 				$res = $this->db->query($sql);
 
 				if ($this->db->num_rows($res) == 0)
 				{
-					$In -> create($user);//echo 'absent dans la liste';
+					$In -> create($user);
 				}
 			}
 		}
@@ -149,38 +170,39 @@ class seedrando extends SeedObject
 	
 	public function saveContact($addprov=false)
 	{
-		
-		$sql = 'SELECT fk_socpeople_target FROM ' .MAIN_DB_PREFIX. 'relationRandoContact ';
+		$sql = 'SELECT fk_socpeople_target FROM ' .MAIN_DB_PREFIX. 'relationRandoContact ';//remplacer la requette par interogation du $this->Tcontact
 		$sql .= 'WHERE fk_socpeople_target = ' . $this->listSelectContact;
 		$sql .= ' and fk_seedRando_source = ' . $this->id;
-		
+	
 		$res = $this->db->query($sql);
 		
 		if ($this->db->num_rows($res) == 0)
 		{
-			// echo 'present dans la liste !!';
 			$sql = 'INSERT INTO ' .MAIN_DB_PREFIX. 'relationRandoContact (fk_seedRando_source, fk_socpeople_target)';
 			$sql .= 'VALUES ('.$this->id.','.$this->listSelectContact.')';	
 			$this->db->query($sql);
 		}
 	}
 	
-	public function loadWaypoints()
+	public function loadRelation($ThisArray, $fk_objectTarget, $tableSelect, $fk_objectSource, $newObject, $Tobject, $fctToCall)
 	{
-		$this->TWaypoint = array();
-		$sql = 'SELECT fk_wayPoint, rowid FROM '.MAIN_DB_PREFIX.'relationTable WHERE fk_seedRando = '.$this->id;
+		$this->$ThisArray = array();
+		$sql = 'SELECT ' .$fk_objectTarget . ', rowid FROM ';
+		$sql .= MAIN_DB_PREFIX . $tableSelect;
+		$sql .= ' WHERE ' .$fk_objectSource. ' = '.$this->id;
+
 		$resql = $this->db->query($sql);
 		if ($resql)
 		{		
 			while($return = $this->db->fetch_object($resql)){
-				$way = new wayPoint($this->db);
-				$way->load($return->fk_wayPoint, '');
-				$this->TWaypoint[] = $way;
+				$relObject = new $newObject($this->db);
+				$relObject->$fctToCall($return->$fk_objectTarget, '');
+				$this->$ThisArray[] = $relObject;
 			}
 		}
-		return $TWaypoint;
+		return $Tobject;
 	}
-	
+		
 	public function loadBy($value, $field, $annexe = false)
 	{
 		$res = parent::loadBy($value, $field, $annexe);
@@ -197,52 +219,10 @@ class seedrando extends SeedObject
 		}
 		return $res;
 	}
-		
-	public function loadContacts()
-	{
-		$TtempContact = array();
-		$sql = 'SELECT fk_socpeople_target FROM '.MAIN_DB_PREFIX.'relationRandoContact WHERE fk_seedRando_source = '.$this->id;
-		$resql = $this->db->query($sql);
-		
-		if ($resql)
-		{
-			while($return = $this->db->fetch_object($resql)){
-				$contact = new contact($this->db);
-				$contact->fetch($return->fk_socpeople_target, '');
-				$this->TContact[] = $contact;
-			}
-		}
-// 		var_dump($TContact);
-		return $TContact;
-	}
-	
-	public function loadByContact($value, $field, $annexe = false)
-	{
-		$res = parent::loadBy($value, $field, $annexe);
-		$this->loadContacts();
-		return $res;
-	}
-	
-	public function loadContact($id, $ref, $loadChild = true)
-	{
-		global $db;
-		$res = parent::fetchCommon($id, $ref);
-		if ($loadChild)
-		{
-			$sql = 'SELECT t.firstname t.lastname';//requette pour permettre l'affichage des waypoints dans la creation de la rando
-			$sql.= ' FROM '.MAIN_DB_PREFIX.'socpeople t WHERE rowid = ' .$res;
-			$dataresult = $db->query($sql);
-			$display = $db->fetch_object($dataresult);
-		}
-		return $display;
-	}
-	
-	
-	
+
 	
 	public function delete(User &$user)
 	{
-		
 		$this->generic->deleteObjectLinked();
 		
 		parent::deleteCommon($user);
@@ -257,17 +237,13 @@ class seedrando extends SeedObject
 			
 			return self::save();
 		}
-		
 		return 0;
 	}
 	
 	public function setValid()
 	{
-//		global $user;
-		
 		$this->ref = $this->getNumero();
 		$this->status = self::STATUS_VALIDATED;
-		
 		return self::save();
 	}
 	
@@ -277,7 +253,6 @@ class seedrando extends SeedObject
 		{
 			return $this->getNextNumero();
 		}
-		
 		return $this->ref;
 	}
 	
@@ -289,34 +264,26 @@ class seedrando extends SeedObject
 		
 		$mask = !empty($conf->global->MYMODULE_REF_MASK) ? $conf->global->MYMODULE_REF_MASK : 'SR{yy}{mm}-{0000}';
 		$numero = get_next_value($db, $mask, 'seedrando', 'ref');
-		
 		return $numero;
 	}
 	
 	public function setRefused()
 	{
-//		global $user;
-		
 		$this->status = self::STATUS_REFUSED;
 		$this->withChild = false;
-		
 		return self::save();
 	}
 	
 	public function setAccepted()
 	{
-//		global $user;
-		
 		$this->status = self::STATUS_ACCEPTED;
 		$this->withChild = false;
-		
 		return self::save();
 	}
 	
 	public function getNomUrl($withpicto=0, $get_params='')
 	{
 		global $langs;
-
         $result='';
         $label = '<u>' . $langs->trans("Showseedrando") . '</u>';
         if (! empty($this->ref)) $label.= '<br><b>'.$langs->trans('Ref').':</b> '.$this->ref;
@@ -332,8 +299,7 @@ class seedrando extends SeedObject
         if ($withpicto && $withpicto != 2) $result.=' ';
 		
         $result.=$link.$this->ref.$linkend;
-		
-        return $result;
+		return $result;
 	}
 	
 	public static function getStaticNomUrl($id, $withpicto=0)
@@ -342,7 +308,6 @@ class seedrando extends SeedObject
 		
 		$object = new seedrando($db);
 		$object->load($id, '',false);
-		
 		return $object->getNomUrl($withpicto);
 	}
 	
@@ -360,7 +325,6 @@ class seedrando extends SeedObject
 		if ($status==self::STATUS_VALIDATED) { $statustrans='statut1'; $keytrans='seedrandoStatusValidated'; $shortkeytrans='Validate'; }
 		if ($status==self::STATUS_REFUSED) { $statustrans='statut5'; $keytrans='seedrandoStatusRefused'; $shortkeytrans='Refused'; }
 		if ($status==self::STATUS_ACCEPTED) { $statustrans='statut6'; $keytrans='seedrandoStatusAccepted'; $shortkeytrans='Accepted'; }
-
 		
 		if ($mode == 0) return img_picto($langs->trans($keytrans), $statustrans);
 		elseif ($mode == 1) return img_picto($langs->trans($keytrans), $statustrans).' '.$langs->trans($keytrans);
@@ -371,25 +335,17 @@ class seedrando extends SeedObject
 	
 }
 
-
-
 class seedrandoDet extends TObjetStd
 {
 	public $table_element = 'seedrandodet';
-
 	public $element = 'seedrandodet';
-	
 	public function __construct($db)
 	{
 		global $conf,$langs;
-		
 		$this->db = $db;
-		
 		$this->init();
-		
 		$this->user = null;
 	}
 	
 	
 }
-

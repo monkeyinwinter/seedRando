@@ -48,8 +48,8 @@ class relationTable extends SeedObject
 		
 		$this->fields=array(
 				'ref'=>array('type'=>'string','length'=>50,'index'=>true)
-				,'fk_seedRando'=>array('type'=>'string')
-				,'fk_wayPoint'=>array('type'=>'string')
+				,'fk_seedRando_source'=>array('type'=>'string')
+				,'fk_wayPoint_target'=>array('type'=>'string')
 				,'status'=>array('type'=>'integer','index'=>true) // date, integer, string, float, array, text
 				,'entity'=>array('type'=>'integer','index'=>true)
 		);
