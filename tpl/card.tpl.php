@@ -97,7 +97,7 @@
 </table>
 
 <form action="http://localhost/dolibarr/htdocs/custom/seedrando/card.php?id=[object.id]" method="POST">
-	<input name="action" type="hidden" value="saveContact">
+	<input name="saveContact" type="hidden" value="saveContact">
 	<table class="noborder" width="100%">
 		<tbody>
 			<tr class="liste_titre">
@@ -117,34 +117,15 @@
 					<input class="button" value="Ajouter" type="submit">
 				</th>
 			</tr>
-			<tr class="oddeven">
-			
-				<!--  ici afficher la liste des objets contact en relation avec la rowid de la rando concernée -->
-				
-				<td class="opacitymedium" colspan="3">
-					<div id="test">
-						<tr>
-							<td>[view.showListContact;strconv=no]</td>
-						</tr>
-					</div>
-				</td>
-			</tr>
 		</tbody>
 	</table>
 </form>
 
-
-
-
-<div style="margin-bottom:250px"></div>
-
-
-
-
-
-
-
-
+<table class="noborder" width="100%">
+	<tbody>
+			[view.showListContact;strconv=no]
+	</tbody>
+</table>
 
 
 [onshow;block=end]

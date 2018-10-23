@@ -1,5 +1,7 @@
 <?php
 
+// $selectNote = array('selectionner'=>'selectionner','1'=>'1','2'=>'2','3'=>'3', '4'=>'4', '5'=>'5');//drop list select pour la note
+
 
 function _get_showWayPoint($object, $mode)
 {
@@ -36,6 +38,36 @@ function _get_showWayPoint($object, $mode)
 	return $html;
 }
 
+// function get_noteRando($object, $idContact)
+// {
+// 	$sql = 'SELECT noteRando FROM '. MAIN_DB_PREFIX . 'relationRandoContact';
+// 	$sql .= ' WHERE fk_seedRando_source = ';
+// 	$sql .= $object->id;
+// 	$sql .= ' AND fk_socpeople_target = ';
+// 	$sql .= $idContact;
+	
+// 	$resql = $object->db->query($sql);
+	
+// 	if($resql)
+// 	{
+// 		while($return = $object->db->fetch_object($resql))
+// 		{
+// 			$relObject = new seedrando($object->db);
+// 			$relObject->load($return->noteRando, '');
+// 			$object->note = $relObject;
+			
+// 		}
+// 	}
+	
+// // 	var_dump($object->note);
+	
+// 	echo $object[0]->note ;
+// 	exit;
+	
+// 	return $note;
+		
+// }
+
 
 function _get_listContact($object, $action)
 {
@@ -50,7 +82,9 @@ function _get_listContact($object, $action)
 	{
 		for ($i = 0; $i<$count ;$i++)
 		{
-			$html .= '<a href="http://localhost/dolibarr/htdocs/custom/seedrando/card.php?id=';
+			//$note = get_noteRando($object, $object->TContact[$i]->id);
+			
+			$html .= '<tr><td><a href="http://localhost/dolibarr/htdocs/custom/seedrando/card.php?id=';
 			$html .= $object->id;
 			$html .= '&action=deleteContact&idContact=';
 			$html .= $object->TContact[$i]->id;
@@ -58,11 +92,31 @@ function _get_listContact($object, $action)
 			$html .= $object->TContact[$i]->firstname;
 			$html .= ' ';
 			$html .= $object->TContact[$i]->lastname;
-			$html .= '</a><br>';
+			$html .= '</a><br></td>';
+			$html .= '<td><form action="http://localhost/dolibarr/htdocs/custom/seedrando/card.php?id=';
+			$html .= $object->id;
+			$html .= '&action=saveNote&idContact=';
+			$html .= $object->TContact[$i]->id;
+			$html .= '" method="post">';
+			$html .= '<input type="hidden" name="action" value="saveNote">
+						<select id="note" name="note">
+							<option value="1">1</option>
+							<option value="2">2</option>
+							<option value="3">3</option>
+							<option value="4">4</option>
+							<option value="5">5</option>
+						</select>';
+			$html .= '<input class="button" type="submit" value="save"></form></td>';
+			$html .= '<td>';
+			$html .=  $note . ' test</td></tr>';
 		}
 	}
 	return $html;
 }
+
+
+
+
 
 function get_listSelectArray ($TlistSelect, $field1, $field2 = '', $table, $ifContact = false)
 {

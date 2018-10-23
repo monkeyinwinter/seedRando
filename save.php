@@ -938,5 +938,264 @@ function _get_showContact ($objectContact, $db)
 
 
 
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+public function save($addprov=false)
+{
+	global $user;
+	if (!$this->id) $this->fk_user_author = $user->id;
+	$res = $this->id>0 ? $this->updateCommon($user) : $this->createCommon($user);
+	if ($addprov || !empty($this->is_clone))
+	{
+		$this->ref = '(PROV'.$this->id.')';
+		if (!empty($this->is_clone)) $this->status = self::STATUS_DRAFT;
+		$wc = $this->withChild;
+		$this->withChild = false;
+		$res = $this->id>0 ? $this->updateCommon($user) : $this->createCommon($user);
+		$this->withChild = $wc;
+	}
+	
+	$this->UpdateOrSaveWay();
+	
+	if(GETPOST('action') == 'save')
+	{
+		if(empty($this->wayPoint))
+		{
+			$this->deleteRelation('relationTable', 'fk_seedRando_source');
+		}
+	}
+	return $res;
+}
+
+
+
+
+public function UpdateOrSaveWay()
+{
+	global $user;
+	$this->loadRelation('TWaypoint', 'fk_wayPoint_target', 'relationTable', 'fk_seedRando_source', 'wayPoint', '$TWaypoint', 'load');
+	
+	$count = count($this->TWaypoint);
+	
+	if(!empty($this->wayPoint))// Sauvegarde de tous les waypoints
+	{
+		foreach($this->wayPoint as $value)
+		{
+			for ($t = 0 ; $t < $count ; $t++)//si donnée present dans this->TWaypoint et present dans this->wayPoint alors save sinon delete
+			{
+				if(!in_array($this->TWaypoint[$t]->id, $this->wayPoint))
+				{
+					//on supprime la valeur dans la table relationnel
+					$sqlDelete = 'DELETE FROM ' .MAIN_DB_PREFIX. 'relationTable';
+					$sqlDelete .= ' WHERE fk_seedRando_source = '.$this->id;
+					$sqlDelete .= ' AND fk_wayPoint_target = '.$this->TWaypoint[$t]->id;
+					$this->db->query($sqlDelete);
+				}
+			}
+			
+			$In = new relationTable($this->db);
+			$In -> fk_seedRando_source = $this->id;
+			$In -> fk_wayPoint_target = $value;
+			
+			$sql = 'SELECT fk_wayPoint_target FROM ' .MAIN_DB_PREFIX. 'relationTable ';//remplacer la requette par interogation du $this->TWaypoint
+			$sql .= 'WHERE fk_wayPoint_target = ' . $value;
+			$sql .= ' and fk_seedRando_source = ' . $this->id;
+			
+			$res = $this->db->query($sql);
+			
+			if ($this->db->num_rows($res) == 0)
+			{
+				$In -> create($user);
+			}
+		}
+	}
+}
+
+public function saveContact()
+{
+	global $user;
+	
+	$In2 = new relationRandoContact($this->db);
+	$In2 -> fk_seedRando_source = $this->id;
+	$In2 -> fk_socpeople_target = $this->listSelectContact;
+	
+	$sql = 'SELECT fk_socpeople_target FROM ' .MAIN_DB_PREFIX. 'relationRandoContact ';//remplacer la requette par interogation du $this->Tcontact
+	$sql .= 'WHERE fk_socpeople_target = ' . $this->listSelectContact;
+	$sql .= ' and fk_seedRando_source = ' . $this->id;
+	
+	$res = $this->db->query($sql);
+	
+	if ($this->db->num_rows($res) == 0)
+	{
+		$In2 -> create($user);
+	}
+}
+			
+
+
+
+
+public function deleteRelation($TableRelation, $fk_source, $fk_target = '', $idContact = '')
+{
+	$sqlDelete2 = 'DELETE FROM ' . MAIN_DB_PREFIX . $TableRelation;
+	$sqlDelete2 .= ' WHERE ' . $fk_source .' = '.$this->id;
+	if($fk_target != '')
+	{
+		$sqlDelete2 .= ' AND ' . $fk_target .' = ' .$idContact;
+	}
+	$this->db->query($sqlDelete2);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+public function save($addprov=false)
+{
+	global $user;
+	if (!$this->id) $this->fk_user_author = $user->id;
+	$res = $this->id>0 ? $this->updateCommon($user) : $this->createCommon($user);
+	if ($addprov || !empty($this->is_clone))
+	{
+		$this->ref = '(PROV'.$this->id.')';
+		if (!empty($this->is_clone)) $this->status = self::STATUS_DRAFT;
+		$wc = $this->withChild;
+		$this->withChild = false;
+		$res = $this->id>0 ? $this->updateCommon($user) : $this->createCommon($user);
+		$this->withChild = $wc;
+	}
+	
+	$this->UpdateOrSaveWay();
+	
+	if(GETPOST('action') == 'save')
+	{
+		if(empty($this->wayPoint))
+		{
+			$this->deleteRelation('relationTable', 'fk_seedRando_source');
+		}
+	}
+	return $res;
+}
+
+public function UpdateOrSaveWay()
+{
+	global $user;
+	$this->loadRelation('TWaypoint', 'fk_wayPoint_target', 'relationTable', 'fk_seedRando_source', 'wayPoint', '$TWaypoint', 'load');
+	
+	$count = count($this->TWaypoint);
+	
+	if(!empty($this->wayPoint))// Sauvegarde de tous les waypoints
+	{
+		foreach($this->wayPoint as $value)
+		{
+			for ($t = 0 ; $t < $count ; $t++)//si donnée present dans this->TWaypoint et present dans this->wayPoint alors save sinon delete
+			{
+				if(!in_array($this->TWaypoint[$t]->id, $this->wayPoint))
+				{
+					//on supprime la valeur dans la table relationnel
+					$idWayPoint = $this->TWaypoint[$t]->id;
+					$this->deleteRelation('relationTable', 'fk_seedRando_source', 'fk_wayPoint_target', $idWayPoint);
+				}
+			}
+			$this->saveRelation('relationTable', 'fk_seedRando_source', 'fk_wayPoint_target', $value, false);
+		}
+	}
+}
+
+public function saveRelation($tableRelation, $fk_source, $fk_target, $listToSave, $ifContact = false)
+{
+	global $user;
+	
+	$In = new $tableRelation($this->db);
+	$In -> $fk_source = $this->id;
+	
+	if($ifContact == true)
+	{
+		$In -> $fk_target = $this->$listToSave;
+	}
+	else
+	{
+		$In -> $fk_target = $listToSave;
+	}
+	
+	$sql = 'SELECT ' . $fk_target . ' FROM ' . MAIN_DB_PREFIX . $tableRelation;//remplacer la requette par interogation du $this->Tcontact
+	$sql .= ' WHERE ' . $fk_target . ' = ';
+	
+	if($ifContact == true)
+	{
+		$sql .= $this->$listToSave;
+	}
+	else
+	{
+		$sql .= $listToSave;
+	}
+	
+	$sql .= ' and ' . $fk_source . ' = ' . $this->id;
+	
+	$res = $this->db->query($sql);
+	
+	if ($this->db->num_rows($res) == 0)
+	{
+		$In -> create($user);
+	}
+}
+
+public function loadRelation($ThisArray, $fk_objectTarget, $tableSelect, $fk_objectSource, $newObject, $Tobject, $fctToCall)
+{
+	$this->$ThisArray = array();
+	$sql = 'SELECT ' .$fk_objectTarget . ', rowid FROM ';
+	$sql .= MAIN_DB_PREFIX . $tableSelect;
+	$sql .= ' WHERE ' .$fk_objectSource. ' = '.$this->id;
+	
+	$resql = $this->db->query($sql);
+	if ($resql)
+	{
+		while($return = $this->db->fetch_object($resql)){
+			$relObject = new $newObject($this->db);
+			$relObject->$fctToCall($return->$fk_objectTarget, '');
+			$this->$ThisArray[] = $relObject;
+		}
+	}
+	return $Tobject;
+}
+
+public function deleteRelation($TableRelation, $fk_source, $fk_target = '', $idContact = '')
+{
+	$sqlDelete = 'DELETE FROM ' . MAIN_DB_PREFIX . $TableRelation;
+	$sqlDelete .= ' WHERE ' . $fk_source .' = '.$this->id;
+	if($fk_target != '')
+	{
+		$sqlDelete .= ' AND ' . $fk_target .' = ' .$idContact;
+	}
+	$this->db->query($sqlDelete);
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 

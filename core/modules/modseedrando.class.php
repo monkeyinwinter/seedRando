@@ -139,7 +139,9 @@ class modseedrando extends DolibarrModules
 		// 'stock'            to add a tab in stock view
 		// 'thirdparty'       to add a tab in third party view
 		// 'user'             to add a tab in user view
-        $this->tabs = array();
+        $this->tabs = array(
+        	//'seedrando:+tabname1:Participant:@seedrando:$user->rights->seedrando->read:/seedrando/tpl/test.tpl.php?id=__ID__'
+        );
 
         // Dictionaries
 	    if (! isset($conf->seedrando->enabled))

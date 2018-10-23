@@ -27,8 +27,14 @@ $ref = GETPOST('ref');
 $ref = GETPOST('ref');
 $ref = GETPOST('ref');
 
+$note = GETPOST('note');
+
+// echo $note;
+// echo $action;
 
 $saveContact = GETPOST('saveContact');
+
+$idContact = GETPOST('idContact');
 
 $mode = 'view';
 if (empty($user->rights->seedrando->write)) $mode = 'view'; // Force 'view' mode if can't edit object
@@ -113,7 +119,7 @@ if (empty($reshook))
 				$mode = 'edit';
 				break;
 			}
-			$object->saveContact(empty($object->ref));
+			$object->saveRelation('relationRandoContact', 'fk_seedRando_source', 'fk_socpeople_target', 'listSelectContact', true);
 			header('Location: '.dol_buildpath('/seedrando/card.php', 1).'?id='.$object->id);
 			exit;
 			break;
@@ -130,12 +136,28 @@ if (empty($reshook))
 			header('Location: '.dol_buildpath('/seedrando/card.php', 1).'?id='.$object->id);
 			exit;
 			break;
+			
+		case 'saveNote':
+			$object->setValues($_REQUEST);
+			
+			if ($error > 0)
+			{
+				$mode = 'edit';
+				break;
+			}
+			$object->saveNote($idContact, $note);
+			header('Location: '.dol_buildpath('/seedrando/card.php', 1).'?id='.$object->id);
+			exit;
+			break;
+			
+			
 	}
 }
 
 /**
  * View
  */
+
 
 $title=$langs->trans("seedrando");
 llxHeader('',$title);
@@ -163,6 +185,7 @@ if (!empty($formconfirm)) echo $formconfirm;
 $TBS=new TTemplateTBS();
 $TBS->TBS->protect=false;
 $TBS->TBS->noerr=true;
+
 
 if ($mode == 'edit') echo $formcore->begin_form($_SERVER['PHP_SELF'], 'form_seedrando');
 
@@ -201,6 +224,7 @@ print $TBS->render('tpl/card.tpl.php'
 				)
 		)
 	);
+
 
 //echo $object->TContact[2]->id;
 

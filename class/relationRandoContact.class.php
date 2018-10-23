@@ -40,6 +40,8 @@ class relationRandoContact extends SeedObject
 
 	public $element = 'relationRandoContact';
 	
+	public $note = '';
+	
 	public function __construct($db)
 	{
 		global $conf,$langs;
@@ -52,6 +54,7 @@ class relationRandoContact extends SeedObject
 				,'target_type_object'=>array('type'=>'string')
 				,'fk_seedRando_source'=>array('type'=>'string')
 				,'fk_socpeople_target'=>array('type'=>'string')
+				,'noteRando'=>array('type'=>'string')
 				,'status'=>array('type'=>'integer','index'=>true) // date, integer, string, float, array, text
 				,'entity'=>array('type'=>'integer','index'=>true)
 		);
