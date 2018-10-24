@@ -60,6 +60,12 @@ class relationTable extends SeedObject
 		$this->entity = $conf->entity;
 	}
 
+	
+	
+
+	
+	
+	
 	public function save($addprov=false)
 	{
 		global $user;

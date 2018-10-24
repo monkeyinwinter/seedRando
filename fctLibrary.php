@@ -48,20 +48,22 @@ function _get_showWayPoint($object, $mode)
 	
 // 	$resql = $object->db->query($sql);
 	
+// 	var_dump( $resql); exit;
+	
 // 	if($resql)
 // 	{
 // 		while($return = $object->db->fetch_object($resql))
 // 		{
-// 			$relObject = new seedrando($object->db);
+// 			$relObject = new relationRandoContact($object->db);
 // 			$relObject->load($return->noteRando, '');
-// 			$object->note = $relObject;
+// 			$relObject->note = $relObject;
 			
 // 		}
 // 	}
 	
-// // 	var_dump($object->note);
+// 	var_dump($relObject->note);
 	
-// 	echo $object[0]->note ;
+// 	echo $relObject->note ;
 // 	exit;
 	
 // 	return $note;
@@ -82,17 +84,14 @@ function _get_listContact($object, $action)
 	{
 		for ($i = 0; $i<$count ;$i++)
 		{
-			//$note = get_noteRando($object, $object->TContact[$i]->id);
+			$relObject = new relationRandoContact($object->db);
 			
-			$html .= '<tr><td><a href="http://localhost/dolibarr/htdocs/custom/seedrando/card.php?id=';
-			$html .= $object->id;
-			$html .= '&action=deleteContact&idContact=';
-			$html .= $object->TContact[$i]->id;
-			$html .= '" title="supprimer le contact de cette rando">';
-			$html .= $object->TContact[$i]->firstname;
+			$note = $relObject::get_noteRando($object, $object->TContact[$i]->id);
+			
+			$html .= '<tr><td>' . $object->TContact[$i]->firstname;
 			$html .= ' ';
 			$html .= $object->TContact[$i]->lastname;
-			$html .= '</a><br></td>';
+			$html .= '</td>';
 			$html .= '<td><form action="http://localhost/dolibarr/htdocs/custom/seedrando/card.php?id=';
 			$html .= $object->id;
 			$html .= '&action=saveNote&idContact=';
@@ -108,7 +107,16 @@ function _get_listContact($object, $action)
 						</select>';
 			$html .= '<input class="button" type="submit" value="save"></form></td>';
 			$html .= '<td>';
-			$html .=  $note . ' test</td></tr>';
+			
+			$html .=  $note . '</td>';
+			
+			$html .= '<td><a href="http://localhost/dolibarr/htdocs/custom/seedrando/card.php?id=';
+			$html .= $object->id;
+			$html .= '&action=deleteContact&idContact=';
+			$html .= $object->TContact[$i]->id;
+			$html .= '" >';
+			$html .= '<img src="/dolibarr/htdocs/theme/eldy/img/delete.png" title="supprimer le contact de cette rando">';			
+			$html .= '</a></td></tr>';
 		}
 	}
 	return $html;

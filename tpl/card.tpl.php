@@ -97,7 +97,7 @@
 </table>
 
 <form action="http://localhost/dolibarr/htdocs/custom/seedrando/card.php?id=[object.id]" method="POST">
-	<input name="saveContact" type="hidden" value="saveContact">
+	<input name="action" type="hidden" value="saveContact">
 	<table class="noborder" width="100%">
 		<tbody>
 			<tr class="liste_titre">

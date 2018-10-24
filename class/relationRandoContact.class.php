@@ -7,6 +7,9 @@ if (!class_exists('SeedObject'))
 	 */
 	define('INC_FROM_DOLIBARR', true);
 	require_once dirname(__FILE__).'/../config.php';
+	dol_include_once('/seedrando/class/wayPoint.class.php');
+	dol_include_once('/seedrando/class/relationTable.class.php');
+	dol_include_once('../contact/class/contact.class.php');
 }
 
 
@@ -40,8 +43,8 @@ class relationRandoContact extends SeedObject
 
 	public $element = 'relationRandoContact';
 	
-	public $note = '';
-	
+	public $noteRando = null;
+
 	public function __construct($db)
 	{
 		global $conf,$langs;
@@ -65,6 +68,38 @@ class relationRandoContact extends SeedObject
 		$this->entity = $conf->entity;
 	}
 
+	
+	public function get_noteRando($object, $idContact)
+	{
+		global $db;
+		
+		$sql = 'SELECT noteRando FROM '. MAIN_DB_PREFIX . 'relationRandoContact';
+		$sql .= ' WHERE fk_seedRando_source = ';
+		$sql .= $object->id;
+		$sql .= ' AND fk_socpeople_target = ';
+		$sql .= $idContact;
+		
+		$test = new relationRandoContact($db);
+		
+		$resql = $test->db->query($sql);
+				
+		if($resql)
+		{
+			while($return = $test->db->fetch_object($resql))
+			{
+				//$relObject = new relationRandoContact($db);
+				//$relObject->load($return->noteRando, '');
+				$noteRando = $return;
+			}
+ 		}
+ 		
+ 		$out = $noteRando->noteRando;
+		
+ 		return $out;
+	}
+
+	
+	
 	public function save($addprov=false)
 	{
 		global $user;

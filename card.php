@@ -113,7 +113,7 @@ if (empty($reshook))
 			
 		case 'saveContact':
 			$object->setValues($_REQUEST);
-
+			
 			if ($error > 0)
 			{
 				$mode = 'edit';
@@ -157,7 +157,6 @@ if (empty($reshook))
 /**
  * View
  */
-
 
 $title=$langs->trans("seedrando");
 llxHeader('',$title);

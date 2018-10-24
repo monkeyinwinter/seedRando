@@ -1190,12 +1190,18 @@ public function deleteRelation($TableRelation, $fk_source, $fk_target = '', $idC
 
 
 
+/var/www/html/dolibarr/htdocs/custom/seedrando/class/relationRandoContact.class.php:93:
+object(stdClass)[124]
+public 'noteRando' => string '2' (length=1)
 
 
 
 
 
-
+/var/www/html/dolibarr/htdocs/custom/seedrando/class/seedrando.class.php:204:
+object(stdClass)[107]
+public 'fk_wayPoint_target' => string '4' (length=1)
+public 'rowid' => string '40' (length=2)
 
 
 

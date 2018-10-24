@@ -70,7 +70,7 @@ class seedrando extends SeedObject
 		$this->status = self::STATUS_DRAFT;
 		$this->entity = $conf->entity;
 	}
-
+	
 	public function saveNote($idContact, $note)
 	{
 		global $user;
@@ -143,7 +143,7 @@ class seedrando extends SeedObject
 	public function saveRelation($tableRelation, $fk_source, $fk_target, $listToSave, $ifContact = false)
 	{
 		global $user;
-			
+		
 		$In = new $tableRelation($this->db);
 		$In -> $fk_source = $this->id;
 		
@@ -177,6 +177,11 @@ class seedrando extends SeedObject
 			$In -> create($user);
 		}
 	}
+	
+	
+	
+
+	
 	
 	public function loadRelation($ThisArray, $fk_objectTarget, $tableSelect, $fk_objectSource, $newObject, $Tobject, $fctToCall)
 	{
