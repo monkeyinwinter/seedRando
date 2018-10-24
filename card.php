@@ -93,16 +93,15 @@ if (empty($reshook))
 			break;
 			
 		case 'confirm_validate':
-			if (!empty($user->rights->seedrando->write)) {
+			if (!empty($user->rights->seedrando->write))
 				$object->setValid();
-			}
 			
 			header('Location: '.dol_buildpath('/seedrando/card.php', 1).'?id='.$object->id);
 			exit;
 			break;
 			
 		case 'confirm_delete':
-			if (!empty($user->rights->seedrando->write)) $object->delete();
+			if (!empty($user->rights->seedrando->write)) $object->delete($user);
 			
 			header('Location: '.dol_buildpath('/seedrando/list.php', 1));
 			exit;

@@ -82,7 +82,7 @@ if (empty($reshook))
 			exit;
 			break;
 		case 'confirm_delete':
-			if (!empty($user->rights->seedrando->write)) $object->delete();
+			if (!empty($user->rights->seedrando->write)) $object->delete($user);
 			
 			header('Location: '.dol_buildpath('/seedrando/list_wayPoint.php', 1));
 			exit;

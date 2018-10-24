@@ -226,7 +226,9 @@ class seedrando extends SeedObject
 	
 	public function delete(User &$user)
 	{
-		$this->generic->deleteObjectLinked();
+// 		global $db;
+
+		$this->deleteObjectLinked();
 		
 		parent::deleteCommon($user);
 	}
