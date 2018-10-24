@@ -29,9 +29,6 @@ $ref = GETPOST('ref');
 
 $note = GETPOST('note');
 
-// echo $note;
-// echo $action;
-
 $saveContact = GETPOST('saveContact');
 
 $idContact = GETPOST('idContact');
@@ -49,9 +46,10 @@ $objectContact = new contact($db);
 $objectRandoContact = new relationRandoContact($db);
 
 if (!empty($id)) $object->load($id, '');
-elseif (!empty($ref)) $object->loadBy($ref, 'ref');//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+elseif (!empty($ref)) $object->loadBy($ref, 'ref');
 
-$object->loadRelation('TWaypoint', 'fk_wayPoint_target', 'relationTable', 'fk_seedRando_source', 'wayPoint', '$TWaypoint', 'load');
+$object->loadRelation('TWaypoint', 'fk_wayPoint_target', 'relationTable', 'fk_seedRando_source', 'wayPoint', '$TWaypoint', 'load'
+);
 
 $hookmanager->initHooks(array('seedrandocard', 'globalcard'));
 
@@ -67,7 +65,8 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 if (empty($reshook))
 {
 	$error = 0;
-	switch ($action) {
+	switch ($action)
+	{
 		case 'save':
 			$object->setValues($_REQUEST); // Set standard attributes
 			
@@ -81,15 +80,18 @@ if (empty($reshook))
 			header('Location: '.dol_buildpath('/seedrando/card.php', 1).'?id='.$object->id);
 			exit;
 			break;
+			
 		case 'confirm_clone':
-			$object->cloneObject();
+			//$object->cloneObject();
 			
 			header('Location: '.dol_buildpath('/seedrando/card.php', 1).'?id='.$object->id);
 			exit;
 			break;
+			
 		case 'modif':
 			if (!empty($user->rights->seedrando->write)) $object->setDraft();
 			break;
+			
 		case 'confirm_validate':
 			if (!empty($user->rights->seedrando->write)) {
 				$object->setValid();
@@ -98,6 +100,7 @@ if (empty($reshook))
 			header('Location: '.dol_buildpath('/seedrando/card.php', 1).'?id='.$object->id);
 			exit;
 			break;
+			
 		case 'confirm_delete':
 			if (!empty($user->rights->seedrando->write)) $object->delete();
 			
@@ -119,7 +122,8 @@ if (empty($reshook))
 				$mode = 'edit';
 				break;
 			}
-			$object->saveRelation('relationRandoContact', 'fk_seedRando_source', 'fk_socpeople_target', 'listSelectContact', true);
+			$object->saveRelation('relationRandoContact', 'fk_seedRando_source', 'fk_socpeople_target', 'listSelectContact', true
+			);
 			header('Location: '.dol_buildpath('/seedrando/card.php', 1).'?id='.$object->id);
 			exit;
 			break;
@@ -132,7 +136,8 @@ if (empty($reshook))
 				$mode = 'edit';
 				break;
 			}
-			$object->deleteRelation('relationRandoContact', 'fk_seedRando_source', 'fk_socpeople_target', $idContact);
+			$object->deleteRelation('relationRandoContact', 'fk_seedRando_source', 'fk_socpeople_target', $idContact
+			);
 			header('Location: '.dol_buildpath('/seedrando/card.php', 1).'?id='.$object->id);
 			exit;
 			break;
@@ -149,7 +154,6 @@ if (empty($reshook))
 			header('Location: '.dol_buildpath('/seedrando/card.php', 1).'?id='.$object->id);
 			exit;
 			break;
-			
 			
 	}
 }
@@ -185,12 +189,15 @@ $TBS=new TTemplateTBS();
 $TBS->TBS->protect=false;
 $TBS->TBS->noerr=true;
 
-
 if ($mode == 'edit') echo $formcore->begin_form($_SERVER['PHP_SELF'], 'form_seedrando');
 
 $linkback = '<a href="'.dol_buildpath('/seedrando/list.php', 1).'">' . $langs->trans("BackToList") . '</a>';
 
-$selectDifficulte = array('selectionner'=>'selectionner','facile'=>'Facile','moyen'=>'Moyen','difficile'=>'Difficile');//drop list select pour la difficulte
+$selectDifficulte = array('selectionner'=>'selectionner'
+							,'facile'=>'Facile'
+							,'moyen'=>'Moyen'
+							,'difficile'=>'Difficile'
+						);
 
 $objectWayPoint = new wayPoint($db);
 
@@ -206,10 +213,10 @@ print $TBS->render('tpl/card.tpl.php'
 						,'showRef' => ($action == 'create') ? $langs->trans('Draft') : $form->showrefnav($object, 'ref', $linkback, 1, 'ref', 'ref', '')
 						,'showLabel' => $formcore->texte('', 'label', $object->label, 80, 255)
 						,'showDistance' => $formcore->texte('', 'distance', $object->distance, 80, 255)
-						,'showWayPoint' => _get_showWayPoint($object, $mode)//modification pour utiliser la drop list difficulte
+						,'showWayPoint' => $objectRelationTable::_get_showWayPoint($object, $mode)//modification pour utiliser la drop list difficulte
 						,'showDifficulte' => _get_showDifficulte($object, $selectDifficulte,  $mode)//modification pour utiliser la drop list difficulte
 						,'showContact' => get_listSelectArray($TContact, 'lastname', 'firstname', 'socpeople', true)
-						,'showListContact' => _get_listContact($object, $action)
+						,'showListContact' => $objectRandoContact::_get_listContact($object, $action)
 						,'showStatus' => $object->getLibStatut(1)
 				)
 				,'langs' => $langs
@@ -224,9 +231,50 @@ print $TBS->render('tpl/card.tpl.php'
 		)
 	);
 
+function get_listSelectArray ($TlistSelect, $field1, $field2 = '', $table, $ifContact = false)
+{
+	global $form, $action, $id, $db;
+	
+	$sql = 'SELECT t.rowid, t.' . $field1 . ',t.' . $field2 ;//requette pour permettre l affichage des waypoints ou des contacts
+	$sql.= ' FROM '.MAIN_DB_PREFIX . $table . ' t ';
+	
+	$dataresult = $db->query($sql);
+	$TlistSelect = array();
+	while ($display = $db->fetch_object($dataresult))
+	{
+		if($table == 'socpeople')
+		{
+			$TlistSelect[$display->rowid] =  $display->firstname . " ". $display->lastname;
+		}
+		else
+		{
+			$TlistSelect[$display->rowid] =  $display->name;
+		}
+	}
+	if ($table == 'socpeople')
+	{
+		$TlistSelect = $form->selectarray('listSelectContact', $TlistSelect, $objectContact->firstname, $objectContact->lastname);
+	}
+	return $TlistSelect;
+}
 
-//echo $object->TContact[2]->id;
 
+function _get_showDifficulte($object, $selectDifficulte, $mode = 'view')
+{
+	global $form;
+	if($mode == 'view')
+	{
+		return $object->difficulte;
+	}
+	elseif ($mode == 'edit')
+	{
+		return $form->selectarray('difficulte'
+									, $selectDifficulte
+									, $object->difficulte
+								);
+	}
+	return '';
+}
 
 if ($mode == 'edit') echo $formcore->end_form();
 

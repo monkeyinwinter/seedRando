@@ -123,6 +123,12 @@
 
 <table class="noborder" width="100%">
 	<tbody>
+		<tr>
+			<td>Participants</td>
+			<td style="text-align: center;">Notes</td>
+			<td style="text-align: center;">Selectionner une note</td>
+			<td></td>
+		</tr>
 			[view.showListContact;strconv=no]
 	</tbody>
 </table>

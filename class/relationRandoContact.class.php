@@ -32,11 +32,10 @@ class relationRandoContact extends SeedObject
 	 */
 	const STATUS_ACCEPTED = 4;
 	
-	public static $TStatus = array(
-		self::STATUS_DRAFT => 'Draft'
-		,self::STATUS_VALIDATED => 'Validate'
-		,self::STATUS_REFUSED => 'Refuse'
-		,self::STATUS_ACCEPTED => 'Accept'
+	public static $TStatus = array(self::STATUS_DRAFT => 'Draft'
+									,self::STATUS_VALIDATED => 'Validate'
+									,self::STATUS_REFUSED => 'Refuse'
+									,self::STATUS_ACCEPTED => 'Accept'
 	);
 	
 	public $table_element = 'relationRandoContact';
@@ -51,33 +50,27 @@ class relationRandoContact extends SeedObject
 		
 		$this->db = $db;
 		
-		$this->fields=array(
-				'ref'=>array('type'=>'string','length'=>50,'index'=>true)
-				,'source_type_object'=>array('type'=>'string')
-				,'target_type_object'=>array('type'=>'string')
-				,'fk_seedRando_source'=>array('type'=>'string')
-				,'fk_socpeople_target'=>array('type'=>'string')
-				,'noteRando'=>array('type'=>'string')
-				,'status'=>array('type'=>'integer','index'=>true) // date, integer, string, float, array, text
-				,'entity'=>array('type'=>'integer','index'=>true)
-		);
+		$this->fields=array('ref'=>array('type'=>'string','length'=>50,'index'=>true)
+							,'source_type_object'=>array('type'=>'string')
+							,'target_type_object'=>array('type'=>'string')
+							,'fk_seedRando_source'=>array('type'=>'string')
+							,'fk_socpeople_target'=>array('type'=>'string')
+							,'noteRando'=>array('type'=>'string')
+							,'status'=>array('type'=>'integer','index'=>true) // date, integer, string, float, array, text
+							,'entity'=>array('type'=>'integer','index'=>true));
 		
 		$this->init();
 		
 		$this->status = self::STATUS_DRAFT;
 		$this->entity = $conf->entity;
 	}
-
 	
 	public function get_noteRando($object, $idContact)
 	{
 		global $db;
-		
 		$sql = 'SELECT noteRando FROM '. MAIN_DB_PREFIX . 'relationRandoContact';
-		$sql .= ' WHERE fk_seedRando_source = ';
-		$sql .= $object->id;
-		$sql .= ' AND fk_socpeople_target = ';
-		$sql .= $idContact;
+		$sql .= ' WHERE fk_seedRando_source = ' . $object->id;
+		$sql .= ' AND fk_socpeople_target = ' . $idContact;
 		
 		$test = new relationRandoContact($db);
 		
@@ -87,18 +80,57 @@ class relationRandoContact extends SeedObject
 		{
 			while($return = $test->db->fetch_object($resql))
 			{
-				//$relObject = new relationRandoContact($db);
-				//$relObject->load($return->noteRando, '');
-				$noteRando = $return;
+				$relObject = new relationRandoContact($db);
+				$relObject->noteRando = $return->noteRando;
 			}
  		}
- 		
- 		$out = $noteRando->noteRando;
-		
- 		return $out;
+ 		return $relObject;
 	}
-
 	
+	public function _get_listContact($object, $action)
+	{
+		global $db;
+		$object->loadRelation('TContact', 'fk_socpeople_target', 'relationRandoContact', 'fk_seedRando_source', 'contact', '$TContact', 'fetch');
+		
+		$count = count($object->TContact);
+		if ($action == "create" || $action == "edit")
+		{
+			$result = "aucun";
+		}
+		else//mode=view
+		{
+			for ($i = 0; $i<$count ;$i++)
+			{
+				$relObject = new relationRandoContact($object->db);
+				
+				$relObject = $relObject::get_noteRando($object, $object->TContact[$i]->id);
+				
+				$html .= 	'<tr><td>' . $object->TContact[$i]->firstname;
+				$html .= 	' ' . $object->TContact[$i]->lastname . '</td>';
+				$html .= 	'<td style="text-align: center;">' . $relObject->noteRando . '</td>';
+				$html .= 	'<td style="width: 200px; text-align: center; margin:0px; padding: 0px;">';
+				$html .= 	'<form action="http://localhost/dolibarr/htdocs/custom/seedrando/card.php?id=';
+				$html .= 	$object->id . '&action=saveNote&idContact=';
+				$html .= 	$object->TContact[$i]->id . '" method="post">';
+				$html .= 	'<input type="hidden" name="action" value="saveNote">';
+				$html .= 	'<select id="note" name="note">';
+				$html .= 	'<option value="'. $relObject->noteRando . '">' . $relObject->noteRando . '</option>
+							<option value="1">1</option>
+							<option value="2">2</option>
+							<option value="3">3</option>
+							<option value="4">4</option>
+							<option value="5">5</option></select>';
+				$html .= 	'<input class="button" type="submit" value="save" style="margin-left:30px;"></form></td>';
+				$html .= 	'<td style="width: 100px; text-align: center; margin:0px; padding: 0px;">';
+				$html .= 	'<a href="http://localhost/dolibarr/htdocs/custom/seedrando/card.php?id=';
+				$html .= 	$object->id . '&action=deleteContact&idContact=';
+				$html .= 	$object->TContact[$i]->id . '" >';
+				$html .= 	'<img src="/dolibarr/htdocs/theme/eldy/img/delete.png"';
+				$html .= 	'title="supprimer le contact de cette rando"></a></td></tr>';
+			}
+		}
+		return $html;
+	}
 	
 	public function save($addprov=false)
 	{
@@ -119,10 +151,8 @@ class relationRandoContact extends SeedObject
 			$res = $this->id>0 ? $this->updateCommon($user) : $this->createCommon($user);
 			$this->withChild = $wc;
 		}
-		
 		return $res;
 	}
-	
 	
 	public function loadBy($value, $field, $annexe = false)
 	{
@@ -144,7 +174,6 @@ class relationRandoContact extends SeedObject
 	
 	public function delete(User &$user)
 	{
-		
 		$this->generic->deleteObjectLinked();
 		
 		parent::deleteCommon($user);
@@ -159,14 +188,11 @@ class relationRandoContact extends SeedObject
 			
 			return self::save();
 		}
-		
 		return 0;
 	}
 	
 	public function setValid()
 	{
-//		global $user;
-		
 		$this->ref = $this->getNumero();
 		$this->status = self::STATUS_VALIDATED;
 		
@@ -179,7 +205,6 @@ class relationRandoContact extends SeedObject
 		{
 			return $this->getNextNumero();
 		}
-		
 		return $this->ref;
 	}
 	
@@ -197,8 +222,6 @@ class relationRandoContact extends SeedObject
 	
 	public function setRefused()
 	{
-//		global $user;
-		
 		$this->status = self::STATUS_REFUSED;
 		$this->withChild = false;
 		
@@ -207,8 +230,6 @@ class relationRandoContact extends SeedObject
 	
 	public function setAccepted()
 	{
-//		global $user;
-		
 		$this->status = self::STATUS_ACCEPTED;
 		$this->withChild = false;
 		
@@ -270,10 +291,7 @@ class relationRandoContact extends SeedObject
 		elseif ($mode == 3) return img_picto($langs->trans($keytrans), $statustrans).' '.$langs->trans($shortkeytrans);
 		elseif ($mode == 4) return $langs->trans($shortkeytrans).' '.img_picto($langs->trans($keytrans), $statustrans);
 	}
-	
 }
-
-
 
 class relationRandoContactDet extends TObjetStd
 {
@@ -291,7 +309,5 @@ class relationRandoContactDet extends TObjetStd
 		
 		$this->user = null;
 	}
-	
-	
 }
 

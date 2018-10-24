@@ -7,6 +7,8 @@ if (!class_exists('SeedObject'))
 	 */
 	define('INC_FROM_DOLIBARR', true);
 	require_once dirname(__FILE__).'/../config.php';
+	
+	
 }
 
 
@@ -46,25 +48,17 @@ class relationTable extends SeedObject
 		
 		$this->db = $db;
 		
-		$this->fields=array(
-				'ref'=>array('type'=>'string','length'=>50,'index'=>true)
-				,'fk_seedRando_source'=>array('type'=>'string')
-				,'fk_wayPoint_target'=>array('type'=>'string')
-				,'status'=>array('type'=>'integer','index'=>true) // date, integer, string, float, array, text
-				,'entity'=>array('type'=>'integer','index'=>true)
-		);
+		$this->fields=array('ref'=>array('type'=>'string','length'=>50,'index'=>true)
+							,'fk_seedRando_source'=>array('type'=>'string')
+							,'fk_wayPoint_target'=>array('type'=>'string')
+							,'status'=>array('type'=>'integer','index'=>true) // date, integer, string, float, array, text
+							,'entity'=>array('type'=>'integer','index'=>true));
 		
 		$this->init();
 		
 		$this->status = self::STATUS_DRAFT;
 		$this->entity = $conf->entity;
 	}
-
-	
-	
-
-	
-	
 	
 	public function save($addprov=false)
 	{
@@ -88,6 +82,47 @@ class relationTable extends SeedObject
 		
 		return $res;
 	}
+	
+	function _get_showWayPoint($object, $mode)
+	{
+		global $form;
+		$html = '';
+		$object->loadRelation('TWaypoint', 'fk_wayPoint_target', 'relationTable', 'fk_seedRando_source', 'wayPoint', '$TWaypoint', 'load');
+		
+		$count = count($object->TWaypoint);
+		if ($mode == 'view')
+		{
+			for ($i = 0; $i<$count ;$i++)
+			{
+				if($i > 0) $html .= ' - ';
+				$html .= $object->TWaypoint[$i]->name;
+			}
+		}
+		else// edit ou add
+		{
+			$TallWayPoint = array();
+			$TlistSelectWayPoint = array();
+			if ($count > 0)
+			{
+				for ($i = 0; $i<$count ; $i++)
+				{
+					$TlistSelectWayPoint[] = $object->TWaypoint[$i]->id;
+				}
+				$TallWayPoint = get_listSelectArray($TlistSelectWayPoint, 'rowid', 'name', 'wayPoint', true);
+				$html = $form->multiselectarray('wayPoint', $TallWayPoint, $TlistSelectWayPoint);
+			}
+			else
+			{
+				$temp = get_listSelectArray($TlistSelectWayPoint, 'rowid', 'name', 'wayPoint', true);
+				$html = $form->multiselectarray('wayPoint', $temp,$objectWayPoint->name);
+			}
+		}
+		return $html;
+	}
+	
+	
+	
+	
 	
 	
 	public function loadBy($value, $field, $annexe = false)

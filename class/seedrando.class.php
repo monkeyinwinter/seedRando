@@ -76,17 +76,12 @@ class seedrando extends SeedObject
 		global $user;
 		
 		$sql = 'UPDATE ' . MAIN_DB_PREFIX . 'relationRandoContact ';
-		$sql .= 'SET noteRando = ';
-		$sql .= $note;
-		$sql .= ' WHERE fk_seedRando_source = ';
-		$sql .= $this->id;
-		$sql .= ' AND fk_socpeople_target = ';
-		$sql .= $idContact;
+		$sql .= 'SET noteRando = ' . $note;
+		$sql .= ' WHERE fk_seedRando_source = ' . $this->id;
+		$sql .= ' AND fk_socpeople_target = ' . $idContact;
 		
 		$this->db->query($sql);
 	}
-	
-	
 	
 	public function save($addprov=false)
 	{
@@ -177,11 +172,7 @@ class seedrando extends SeedObject
 			$In -> create($user);
 		}
 	}
-	
-	
-	
 
-	
 	
 	public function loadRelation($ThisArray, $fk_objectTarget, $tableSelect, $fk_objectSource, $newObject, $Tobject, $fctToCall)
 	{
