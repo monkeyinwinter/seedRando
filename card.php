@@ -48,8 +48,8 @@ $objectRandoContact = new relationRandoContact($db);
 if (!empty($id)) $object->load($id, '');
 elseif (!empty($ref)) $object->loadBy($ref, 'ref');
 
-$object->loadRelation('TWaypoint', 'fk_wayPoint_target', 'relationTable', 'fk_seedRando_source', 'wayPoint', '$TWaypoint', 'load'
-);
+$object->loadRelation('TWaypoint', 'fk_target', 'relationTable', 'fk_source', 'wayPoint', '$TWaypoint', 'load', 'wayPoint');
+$object->loadRelation('TContact', 'fk_target', 'relationTable', 'fk_source', 'socpeople', '$TContact', 'fetch', 'contact');
 
 $hookmanager->initHooks(array('seedrandocard', 'globalcard'));
 
@@ -121,8 +121,7 @@ if (empty($reshook))
 				$mode = 'edit';
 				break;
 			}
-			$object->saveRelation('relationRandoContact', 'fk_seedRando_source', 'fk_socpeople_target', 'listSelectContact', true
-			);
+			$object->saveRelation('relationTable', 'seedRando' , 'socpeople' , 'fk_source', 'fk_target', 'listSelectContact', true);
 			header('Location: '.dol_buildpath('/seedrando/card.php', 1).'?id='.$object->id);
 			exit;
 			break;
@@ -135,8 +134,7 @@ if (empty($reshook))
 				$mode = 'edit';
 				break;
 			}
-			$object->deleteRelation('relationRandoContact', 'fk_seedRando_source', 'fk_socpeople_target', $idContact
-			);
+			$object->deleteRelation('relationTable', 'seedRando' , 'socpeople' , 'fk_source', 'fk_target', $idContact);
 			header('Location: '.dol_buildpath('/seedrando/card.php', 1).'?id='.$object->id);
 			exit;
 			break;
@@ -212,10 +210,10 @@ print $TBS->render('tpl/card.tpl.php'
 						,'showRef' => ($action == 'create') ? $langs->trans('Draft') : $form->showrefnav($object, 'ref', $linkback, 1, 'ref', 'ref', '')
 						,'showLabel' => $formcore->texte('', 'label', $object->label, 80, 255)
 						,'showDistance' => $formcore->texte('', 'distance', $object->distance, 80, 255)
-						,'showWayPoint' => $objectRelationTable::_get_showWayPoint($object, $mode)//modification pour utiliser la drop list difficulte
 						,'showDifficulte' => _get_showDifficulte($object, $selectDifficulte,  $mode)//modification pour utiliser la drop list difficulte
-						,'showContact' => get_listSelectArray($TContact, 'lastname', 'firstname', 'socpeople', true)
-						,'showListContact' => $objectRandoContact::_get_listContact($object, $action)
+						,'showWayPoint' => $objectRelationTable::_get_showWayPoint($object, $mode)
+						,'showContact' => get_listSelectArray($TContact, 'lastname', 'firstname', 'socpeople')
+						,'showListContact' => $objectRelationTable::_get_listContact($object, $action)
 						,'showStatus' => $object->getLibStatut(1)
 				)
 				,'langs' => $langs
@@ -230,7 +228,7 @@ print $TBS->render('tpl/card.tpl.php'
 		)
 	);
 
-function get_listSelectArray ($TlistSelect, $field1, $field2 = '', $table, $ifContact = false)
+function get_listSelectArray ($TlistSelect, $field1, $field2 = '', $table)
 {
 	global $form, $action, $id, $db;
 	

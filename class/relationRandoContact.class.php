@@ -65,72 +65,72 @@ class relationRandoContact extends SeedObject
 		$this->entity = $conf->entity;
 	}
 	
-	public function get_noteRando($object, $idContact)
-	{
-		global $db;
-		$sql = 'SELECT noteRando FROM '. MAIN_DB_PREFIX . 'relationRandoContact';
-		$sql .= ' WHERE fk_seedRando_source = ' . $object->id;
-		$sql .= ' AND fk_socpeople_target = ' . $idContact;
+// 	public function get_noteRando($object, $idContact)
+// 	{
+// 		global $db;
+// 		$sql = 'SELECT noteRando FROM '. MAIN_DB_PREFIX . 'relationRandoContact';
+// 		$sql .= ' WHERE fk_seedRando_source = ' . $object->id;
+// 		$sql .= ' AND fk_socpeople_target = ' . $idContact;
 		
-		$test = new relationRandoContact($db);
+// 		$test = new relationTable($db);
 		
-		$resql = $test->db->query($sql);
+// 		$resql = $test->db->query($sql);
 				
-		if($resql)
-		{
-			while($return = $test->db->fetch_object($resql))
-			{
-				$relObject = new relationRandoContact($db);
-				$relObject->noteRando = $return->noteRando;
-			}
- 		}
- 		return $relObject;
-	}
+// 		if($resql)
+// 		{
+// 			while($return = $test->db->fetch_object($resql))
+// 			{
+// 				$relObject = new relationTable($db);
+// 				$relObject->noteRando = $return->noteRando;
+// 			}
+//  		}
+//  		return $relObject;
+// 	}
 	
-	public function _get_listContact($object, $action)
-	{
-		global $db;
-		$object->loadRelation('TContact', 'fk_socpeople_target', 'relationRandoContact', 'fk_seedRando_source', 'contact', '$TContact', 'fetch');
+// 	public function _get_listContact($object, $action)
+// 	{
+// 		global $db;
+// 		$object->loadRelation('TContact', 'fk_target', 'relationTable', 'fk_source', 'contact', '$TContact', 'fetch');
 		
-		$count = count($object->TContact);
-		if ($action == "create" || $action == "edit")
-		{
-			$result = "aucun";
-		}
-		else//mode=view
-		{
-			for ($i = 0; $i<$count ;$i++)
-			{
-				$relObject = new relationRandoContact($object->db);
+// 		$count = count($object->TContact);
+// 		if ($action == "create" || $action == "edit")
+// 		{
+// 			$result = "aucun";
+// 		}
+// 		else//mode=view
+// 		{
+// 			for ($i = 0; $i<$count ;$i++)
+// 			{
+// 				$relObject = new relationTable($object->db);
 				
-				$relObject = $relObject::get_noteRando($object, $object->TContact[$i]->id);
+// 				$relObject = $relObject::get_noteRando($object, $object->TContact[$i]->id);
 				
-				$html .= 	'<tr><td>' . $object->TContact[$i]->firstname;
-				$html .= 	' ' . $object->TContact[$i]->lastname . '</td>';
-				$html .= 	'<td style="text-align: center;">' . $relObject->noteRando . '</td>';
-				$html .= 	'<td style="width: 200px; text-align: center; margin:0px; padding: 0px;">';
-				$html .= 	'<form action="http://localhost/dolibarr/htdocs/custom/seedrando/card.php?id=';
-				$html .= 	$object->id . '&action=saveNote&idContact=';
-				$html .= 	$object->TContact[$i]->id . '" method="post">';
-				$html .= 	'<input type="hidden" name="action" value="saveNote">';
-				$html .= 	'<select id="note" name="note">';
-				$html .= 	'<option value="'. $relObject->noteRando . '">' . $relObject->noteRando . '</option>
-							<option value="1">1</option>
-							<option value="2">2</option>
-							<option value="3">3</option>
-							<option value="4">4</option>
-							<option value="5">5</option></select>';
-				$html .= 	'<input class="button" type="submit" value="save" style="margin-left:30px;"></form></td>';
-				$html .= 	'<td style="width: 100px; text-align: center; margin:0px; padding: 0px;">';
-				$html .= 	'<a href="http://localhost/dolibarr/htdocs/custom/seedrando/card.php?id=';
-				$html .= 	$object->id . '&action=deleteContact&idContact=';
-				$html .= 	$object->TContact[$i]->id . '" >';
-				$html .= 	'<img src="/dolibarr/htdocs/theme/eldy/img/delete.png"';
-				$html .= 	'title="supprimer le contact de cette rando"></a></td></tr>';
-			}
-		}
-		return $html;
-	}
+// 				$html .= 	'<tr><td>' . $object->TContact[$i]->firstname;
+// 				$html .= 	' ' . $object->TContact[$i]->lastname . '</td>';
+// 				$html .= 	'<td style="text-align: center;">' . $relObject->noteRando . '</td>';
+// 				$html .= 	'<td style="width: 200px; text-align: center; margin:0px; padding: 0px;">';
+// 				$html .= 	'<form action="http://localhost/dolibarr/htdocs/custom/seedrando/card.php?id=';
+// 				$html .= 	$object->id . '&action=saveNote&idContact=';
+// 				$html .= 	$object->TContact[$i]->id . '" method="post">';
+// 				$html .= 	'<input type="hidden" name="action" value="saveNote">';
+// 				$html .= 	'<select id="note" name="note">';
+// 				$html .= 	'<option value="'. $relObject->noteRando . '">' . $relObject->noteRando . '</option>
+// 							<option value="1">1</option>
+// 							<option value="2">2</option>
+// 							<option value="3">3</option>
+// 							<option value="4">4</option>
+// 							<option value="5">5</option></select>';
+// 				$html .= 	'<input class="button" type="submit" value="save" style="margin-left:30px;"></form></td>';
+// 				$html .= 	'<td style="width: 100px; text-align: center; margin:0px; padding: 0px;">';
+// 				$html .= 	'<a href="http://localhost/dolibarr/htdocs/custom/seedrando/card.php?id=';
+// 				$html .= 	$object->id . '&action=deleteContact&idContact=';
+// 				$html .= 	$object->TContact[$i]->id . '" >';
+// 				$html .= 	'<img src="/dolibarr/htdocs/theme/eldy/img/delete.png"';
+// 				$html .= 	'title="supprimer le contact de cette rando"></a></td></tr>';
+// 			}
+// 		}
+// 		return $html;
+// 	}
 	
 	public function save($addprov=false)
 	{

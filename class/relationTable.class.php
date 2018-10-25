@@ -42,6 +42,8 @@ class relationTable extends SeedObject
 
 	public $element = 'relationTable';
 	
+	public $noteRando = null;
+	
 	public function __construct($db)
 	{
 		global $conf,$langs;
@@ -49,8 +51,11 @@ class relationTable extends SeedObject
 		$this->db = $db;
 		
 		$this->fields=array('ref'=>array('type'=>'string','length'=>50,'index'=>true)
-							,'fk_seedRando_source'=>array('type'=>'string')
-							,'fk_wayPoint_target'=>array('type'=>'string')
+							,'source_type_object'=>array('type'=>'string')
+							,'target_type_object'=>array('type'=>'string')
+							,'fk_source'=>array('type'=>'string')
+							,'fk_target'=>array('type'=>'string')
+							,'noteRando'=>array('type'=>'string')
 							,'status'=>array('type'=>'integer','index'=>true) // date, integer, string, float, array, text
 							,'entity'=>array('type'=>'integer','index'=>true));
 		
@@ -87,7 +92,7 @@ class relationTable extends SeedObject
 	{
 		global $form;
 		$html = '';
-		$object->loadRelation('TWaypoint', 'fk_wayPoint_target', 'relationTable', 'fk_seedRando_source', 'wayPoint', '$TWaypoint', 'load');
+		$object->loadRelation('TWaypoint', 'fk_target', 'relationTable', 'fk_source', 'wayPoint', '$TWaypoint', 'load', 'wayPoint');
 		
 		$count = count($object->TWaypoint);
 		if ($mode == 'view')
@@ -108,20 +113,88 @@ class relationTable extends SeedObject
 				{
 					$TlistSelectWayPoint[] = $object->TWaypoint[$i]->id;
 				}
-				$TallWayPoint = get_listSelectArray($TlistSelectWayPoint, 'rowid', 'name', 'wayPoint', true);
-				$html = $form->multiselectarray('wayPoint', $TallWayPoint, $TlistSelectWayPoint);
+				$TallWayPoint = get_listSelectArray($TlistSelectWayPoint, 'rowid', 'name', 'wayPoint');
+				$html = $form->multiselectarray('listSelectWayPoint', $TallWayPoint, $TlistSelectWayPoint);
 			}
 			else
 			{
-				$temp = get_listSelectArray($TlistSelectWayPoint, 'rowid', 'name', 'wayPoint', true);
-				$html = $form->multiselectarray('wayPoint', $temp,$objectWayPoint->name);
+				$temp = get_listSelectArray($TlistSelectWayPoint, 'rowid', 'name', 'wayPoint');
+				$html = $form->multiselectarray('listSelectWayPoint', $temp, $objectWayPoint->name);
 			}
 		}
 		return $html;
 	}
 	
 	
+	public function get_noteRando($object, $idContact)
+	{
+		global $db;
+		$sql = 'SELECT noteRando FROM '. MAIN_DB_PREFIX . 'relationTable';
+		$sql .= ' WHERE fk_source = ' . $object->id;
+		$sql .= ' AND fk_target = ' . $idContact;
+		$sql .= ' AND target_type_object = "socpeople"';
+		
+		
+// 		echo $sql;exit;
+		$test = new relationTable($db);
+		
+		$resql = $test->db->query($sql);
+		
+		if($resql)
+		{
+			while($return = $test->db->fetch_object($resql))
+			{
+				$relObject = new relationTable($db);
+				$relObject->noteRando = $return->noteRando;
+			}
+		}
+		return $relObject;
+	}
 	
+	public function _get_listContact($object, $action)
+	{
+		global $db;
+		$object->loadRelation('TContact', 'fk_target', 'relationTable', 'fk_source', 'contact', '$TContact', 'fetch', 'socpeople');
+		
+		$count = count($object->TContact);
+		if ($action == "create" || $action == "edit")
+		{
+			$result = "aucun";
+		}
+		else//mode=view
+		{
+			for ($i = 0; $i<$count ;$i++)
+			{
+				$relObject = new relationTable($object->db);
+				
+				$relObject = $relObject::get_noteRando($object, $object->TContact[$i]->id);
+				
+				$html .= 	'<tr><td>' . $object->TContact[$i]->firstname;
+				$html .= 	' ' . $object->TContact[$i]->lastname . '</td>';
+				$html .= 	'<td style="text-align: center;">' . $relObject->noteRando . '</td>';
+				$html .= 	'<td style="width: 200px; text-align: center; margin:0px; padding: 0px;">';
+				$html .= 	'<form action="http://localhost/dolibarr/htdocs/custom/seedrando/card.php?id=';
+				$html .= 	$object->id . '&action=saveNote&idContact=';
+				$html .= 	$object->TContact[$i]->id . '" method="post">';
+				$html .= 	'<input type="hidden" name="action" value="saveNote">';
+				$html .= 	'<select id="note" name="note">';
+				$html .= 	'<option value="'. $relObject->noteRando . '">' . $relObject->noteRando . '</option>
+							<option value="1">1</option>
+							<option value="2">2</option>
+							<option value="3">3</option>
+							<option value="4">4</option>
+							<option value="5">5</option></select>';
+				$html .= 	'<input class="button" type="submit" value="save" style="margin-left:30px;"></form></td>';
+				$html .= 	'<td style="width: 100px; text-align: center; margin:0px; padding: 0px;">';
+				$html .= 	'<a href="http://localhost/dolibarr/htdocs/custom/seedrando/card.php?id=';
+				$html .= 	$object->id . '&action=deleteContact&idContact=';
+				$html .= 	$object->TContact[$i]->id . '" >';
+				$html .= 	'<img src="/dolibarr/htdocs/theme/eldy/img/delete.png"';
+				$html .= 	'title="supprimer le contact de cette rando"></a></td></tr>';
+			}
+		}
+		return $html;
+	}
 	
 	
 	

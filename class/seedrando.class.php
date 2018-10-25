@@ -75,10 +75,10 @@ class seedrando extends SeedObject
 	{
 		global $user;
 		
-		$sql = 'UPDATE ' . MAIN_DB_PREFIX . 'relationRandoContact ';
+		$sql = 'UPDATE ' . MAIN_DB_PREFIX . 'relationTable ';
 		$sql .= 'SET noteRando = ' . $note;
-		$sql .= ' WHERE fk_seedRando_source = ' . $this->id;
-		$sql .= ' AND fk_socpeople_target = ' . $idContact;
+		$sql .= ' WHERE fk_source = ' . $this->id;
+		$sql .= ' AND fk_target = ' . $idContact;
 		
 		$this->db->query($sql);
 	}
@@ -102,9 +102,9 @@ class seedrando extends SeedObject
 	
 		if(GETPOST('action') == 'save')
 		{
-			if(empty($this->wayPoint))
+			if(empty($this->listSelectWayPoint))
 			{
-				$this->deleteRelation('relationTable', 'fk_seedRando_source');
+				$this->deleteRelation('relationTable', 'fk_source');
 			}
 		}
 		return $res;
@@ -113,46 +113,48 @@ class seedrando extends SeedObject
 	public function UpdateOrSaveWay()
 	{
 		global $user;
-		$this->loadRelation('TWaypoint', 'fk_wayPoint_target', 'relationTable', 'fk_seedRando_source', 'wayPoint', '$TWaypoint', 'load');
+		$this->loadRelation('TWaypoint', 'fk_target', 'relationTable', 'fk_source', 'wayPoint', '$TWaypoint', 'load');
 
 		$count = count($this->TWaypoint);
 		
-		if(!empty($this->wayPoint))// Sauvegarde de tous les waypoints
+		if(!empty($this->listSelectWayPoint))// Sauvegarde de tous les waypoints
 		{
-			foreach($this->wayPoint as $value)
+			foreach($this->listSelectWayPoint as $value)
 			{
 				for ($t = 0 ; $t < $count ; $t++)//si donnée present dans this->TWaypoint et present dans this->wayPoint alors save sinon delete
 				{
-					if(!in_array($this->TWaypoint[$t]->id, $this->wayPoint))
+					if(!in_array($this->TWaypoint[$t]->id, $this->listSelectWayPoint))
 					{
 						//on supprime la valeur dans la table relationnel
 						$idWayPoint = $this->TWaypoint[$t]->id;
-						$this->deleteRelation('relationTable', 'fk_seedRando_source', 'fk_wayPoint_target', $idWayPoint);
+						$this->deleteRelation('relationTable', 'fk_source', 'fk_target', $idWayPoint, '');
 					}
 				}
-				$this->saveRelation('relationTable', 'fk_seedRando_source', 'fk_wayPoint_target', $value, false);
+				$this->saveRelation('relationTable', 'seedRando', 'wayPoint', 'fk_source', 'fk_target', $value, false);
 			}
 		}
 	}
 
-	public function saveRelation($tableRelation, $fk_source, $fk_target, $listToSave, $ifContact = false)
+	public function saveRelation($tableRelation, $source_type_object, $target_type_object, $fk_source, $fk_target, $listToSave, $ifContact = false)
 	{
 		global $user;
 		
 		$In = new $tableRelation($this->db);
-		$In -> $fk_source = $this->id;
+		$In -> source_type_object = $source_type_object;
+		$In -> target_type_object = $target_type_object;
+		$In -> fk_source = $this->id;
 		
 		if($ifContact == true)
 		{
-			$In -> $fk_target = $this->$listToSave;
+			$In -> fk_target = $this->$listToSave;
 		}
 		else
 		{
-			$In -> $fk_target = $listToSave;
+			$In -> fk_target = $listToSave;
 		}
 
-		$sql = 'SELECT ' . $fk_target . ' FROM ' . MAIN_DB_PREFIX . $tableRelation;//remplacer la requette par interogation du $this->Tcontact
-		$sql .= ' WHERE ' . $fk_target . ' = ';
+		$sql = 'SELECT fk_target  FROM ' . MAIN_DB_PREFIX . $tableRelation;//remplacer la requette par interogation du $this->Tcontact
+		$sql .= ' WHERE fk_target  = ';
 		
 		if($ifContact == true)
 		{
@@ -163,7 +165,7 @@ class seedrando extends SeedObject
 			$sql .= $listToSave;
 		}
 		
-		$sql .= ' and ' . $fk_source . ' = ' . $this->id;
+		$sql .= ' and fk_source = ' . $this->id;
 		
 		$res = $this->db->query($sql);
 		
@@ -174,34 +176,39 @@ class seedrando extends SeedObject
 	}
 
 	
-	public function loadRelation($ThisArray, $fk_objectTarget, $tableSelect, $fk_objectSource, $newObject, $Tobject, $fctToCall)
+	public function loadRelation($ThisArray, $fk_Target, $tableSelect, $fk_Source, $newObject, $Tobject, $fctToCall, $target_type_object = '')
 	{
 		$this->$ThisArray = array();
-		$sql = 'SELECT ' .$fk_objectTarget . ', rowid FROM ';
-		$sql .= MAIN_DB_PREFIX . $tableSelect;
-		$sql .= ' WHERE ' .$fk_objectSource. ' = '.$this->id;
+		$sql = 'SELECT fk_Target, rowid FROM ';
+		$sql .= MAIN_DB_PREFIX . 'relationTable';
+		$sql .= ' WHERE fk_Source = '. $this->id;
+		$sql .= ' AND target_type_object = "'. $target_type_object .'"';
 
+// 		echo $sql; exit;
+		
 		$resql = $this->db->query($sql);
 		if ($resql)
 		{		
 			while($return = $this->db->fetch_object($resql)){
 				$relObject = new $newObject($this->db);
-				$relObject->$fctToCall($return->$fk_objectTarget, '');
+				$relObject->$fctToCall($return->fk_Target, '');
 				$this->$ThisArray[] = $relObject;
 			}
 		}
 		return $Tobject;
 	}
 		
-	public function deleteRelation($TableRelation, $fk_source, $fk_target = '', $idContact = '')
+	public function deleteRelation($TableRelation, $fk_source, $fk_target = '', $x= '', $z='', $idContact = '', $target_type_object = '')
 	{
-		$sqlDelete = 'DELETE FROM ' . MAIN_DB_PREFIX . $TableRelation;
-		$sqlDelete .= ' WHERE ' . $fk_source .' = '.$this->id;
+		$sqlDelete = 'DELETE FROM ' . MAIN_DB_PREFIX . 'relationTable';
+		$sqlDelete .= ' WHERE fk_source = '.$this->id;
 		
 		if($fk_target != '')
 		{
-			$sqlDelete .= ' AND ' . $fk_target .' = ' .$idContact;
+			$sqlDelete .= ' AND fk_target = ' .$idContact;
 		}
+		$sql .= ' AND target_type_object = "' . $target_type_object .'"';
+		
 		$this->db->query($sqlDelete);
 	}
 	
