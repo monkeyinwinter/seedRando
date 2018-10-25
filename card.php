@@ -7,10 +7,8 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
 dol_include_once('/seedrando/class/seedrando.class.php');
 dol_include_once('/seedrando/class/wayPoint.class.php');
 dol_include_once('/seedrando/class/relationTable.class.php');
-dol_include_once('/seedrando/class/relationRandoContact.class.php');
 dol_include_once('../contact/class/contact.class.php');
 dol_include_once('/seedrando/lib/seedrando.lib.php');
-dol_include_once('/seedrando/fctLibrary.php');
 
 if(empty($user->rights->seedrando->read)) accessforbidden();
 
@@ -42,8 +40,6 @@ $object = new seedrando($db);
 $objectRelationTable = new relationTable($db);
 
 $objectContact = new contact($db);
-
-$objectRandoContact = new relationRandoContact($db);
 
 if (!empty($id)) $object->load($id, '');
 elseif (!empty($ref)) $object->loadBy($ref, 'ref');

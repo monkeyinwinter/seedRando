@@ -133,9 +133,7 @@ class relationTable extends SeedObject
 		$sql .= ' WHERE fk_source = ' . $object->id;
 		$sql .= ' AND fk_target = ' . $idContact;
 		$sql .= ' AND target_type_object = "socpeople"';
-		
-		
-// 		echo $sql;exit;
+
 		$test = new relationTable($db);
 		
 		$resql = $test->db->query($sql);

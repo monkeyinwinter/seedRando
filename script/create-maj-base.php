@@ -18,7 +18,6 @@ if(!defined('INC_FROM_DOLIBARR')) {
 dol_include_once('/seedrando/class/seedrando.class.php');
 dol_include_once('/seedrando/class/wayPoint.class.php');
 dol_include_once('/seedrando/class/relationTable.class.php');
-dol_include_once('/seedrando/class/relationRandoContact.class.php');
 
 $o=new seedrando($db);
 $o->init_db_by_vars();
@@ -29,6 +28,4 @@ $o->init_db_by_vars();
 $o=new relationTable($db);
 $o->init_db_by_vars();
 
-$o=new relationRandoContact($db);
-$o->init_db_by_vars();
 //

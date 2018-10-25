@@ -154,7 +154,7 @@ class seedrando extends SeedObject
 			$In -> fk_target = $listToSave;
 		}
 
-		$sql = 'SELECT fk_target  FROM ' . MAIN_DB_PREFIX . $tableRelation;//remplacer la requette par interogation du $this->Tcontact
+		$sql = 'SELECT fk_target  FROM ' . MAIN_DB_PREFIX . 'relationTable';//remplacer la requette par interogation du $this->Tcontact
 		$sql .= ' WHERE fk_target  = ';
 		
 		if($ifContact == true)
@@ -167,6 +167,8 @@ class seedrando extends SeedObject
 		}
 		
 		$sql .= ' and fk_source = ' . $this->id;
+		
+		//$sql .= ' AND target_type_object = "' . $target_type_object .'"';
 		
 		$res = $this->db->query($sql);
 		
