@@ -79,6 +79,7 @@ class seedrando extends SeedObject
 		$sql .= 'SET noteRando = ' . $note;
 		$sql .= ' WHERE fk_source = ' . $this->id;
 		$sql .= ' AND fk_target = ' . $idContact;
+		$sql .= ' AND target_type_object = "socpeople"';
 		
 		$this->db->query($sql);
 	}
@@ -183,8 +184,6 @@ class seedrando extends SeedObject
 		$sql .= MAIN_DB_PREFIX . 'relationTable';
 		$sql .= ' WHERE fk_Source = '. $this->id;
 		$sql .= ' AND target_type_object = "'. $target_type_object .'"';
-
-// 		echo $sql; exit;
 		
 		$resql = $this->db->query($sql);
 		if ($resql)
