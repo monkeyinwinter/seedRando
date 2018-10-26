@@ -33,6 +33,10 @@ $saveContact = GETPOST('saveContact');
 
 $idContact = GETPOST('idContact');
 
+$saveType = GETPOST('saveType');
+
+$confirm = GETPOST('confirm');
+
 $mode = 'view';
 if (empty($user->rights->seedrando->write)) $mode = 'view'; // Force 'view' mode if can't edit object
 else if ($action == 'create' || $action == 'edit') $mode = 'edit';
@@ -43,13 +47,12 @@ $objectRelationTable = new relationTable($db);
 
 $objectContact = new contact($db);
 
-$objectRandoContact = new relationRandoContact($db);
+// $objectRandoContact = new relationRandoContact($db);
 
 if (!empty($id)) $object->load($id, '');
 elseif (!empty($ref)) $object->loadBy($ref, 'ref');
 
-$object->loadRelation('TWaypoint', 'fk_wayPoint_target', 'relationTable', 'fk_seedRando_source', 'wayPoint', '$TWaypoint', 'load'
-);
+//$object->loadRelation('TWaypoint', 'fk_target', 'relationTable', 'fk_seedRando_source', 'wayPoint', '$TWaypoint', 'load');
 
 $hookmanager->initHooks(array('seedrandocard', 'globalcard'));
 
@@ -75,7 +78,19 @@ if (empty($reshook))
 				$mode = 'edit';
 				break;
 			}
-			$object->save(empty($object->ref));
+
+			if($saveType == 'saveWay&Rando' || $confirm == 'yes')
+			{
+				$target_type_object = 'wayPoint';
+			}
+			else
+			{
+				//echo 'toto';exit;
+				$target_type_object = 'contact';
+			}
+			
+			
+			$object->save(empty($object->ref), $target_type_object);
 			
 			header('Location: '.dol_buildpath('/seedrando/card.php', 1).'?id='.$object->id);
 			exit;
@@ -113,19 +128,19 @@ if (empty($reshook))
 			exit;
 			break;
 			
-		case 'saveContact':
-			$object->setValues($_REQUEST);
+// 		case 'saveContact':
+// 			$object->setValues($_REQUEST);
 			
-			if ($error > 0)
-			{
-				$mode = 'edit';
-				break;
-			}
-			$object->saveRelation('relationRandoContact', 'fk_seedRando_source', 'fk_socpeople_target', 'listSelectContact', true
-			);
-			header('Location: '.dol_buildpath('/seedrando/card.php', 1).'?id='.$object->id);
-			exit;
-			break;
+// 			if ($error > 0)
+// 			{
+// 				$mode = 'edit';
+// 				break;
+// 			}
+// 			$object->saveRelation('relationRandoContact', 'fk_seedRando_source', 'fk_target', 'listSelectContact', true
+// 					);
+// 			header('Location: '.dol_buildpath('/seedrando/card.php', 1).'?id='.$object->id);
+// 			exit;
+// 			break;
 			
 		case 'deleteContact':
 			$object->setValues($_REQUEST);
@@ -136,7 +151,7 @@ if (empty($reshook))
 				break;
 			}
 			$object->deleteRelation('relationRandoContact', 'fk_seedRando_source', 'fk_socpeople_target', $idContact
-			);
+					);
 			header('Location: '.dol_buildpath('/seedrando/card.php', 1).'?id='.$object->id);
 			exit;
 			break;
@@ -192,11 +207,7 @@ if ($mode == 'edit') echo $formcore->begin_form($_SERVER['PHP_SELF'], 'form_seed
 
 $linkback = '<a href="'.dol_buildpath('/seedrando/list.php', 1).'">' . $langs->trans("BackToList") . '</a>';
 
-$selectDifficulte = array('selectionner'=>'selectionner'
-							,'facile'=>'Facile'
-							,'moyen'=>'Moyen'
-							,'difficile'=>'Difficile'
-						);
+$selectDifficulte = array('selectionner'=>'selectionner', 'facile'=>'Facile', 'moyen'=>'Moyen', 'difficile'=>'Difficile');
 
 $objectWayPoint = new wayPoint($db);
 
@@ -215,7 +226,7 @@ print $TBS->render('tpl/card.tpl.php'
 						,'showWayPoint' => $objectRelationTable::_get_showWayPoint($object, $mode)//modification pour utiliser la drop list difficulte
 						,'showDifficulte' => _get_showDifficulte($object, $selectDifficulte,  $mode)//modification pour utiliser la drop list difficulte
 						,'showContact' => get_listSelectArray($TContact, 'lastname', 'firstname', 'socpeople', true)
-						,'showListContact' => $objectRandoContact::_get_listContact($object, $action)
+						,'showListContact' => $objectRelationTable::_get_listContact($object, $action)
 						,'showStatus' => $object->getLibStatut(1)
 				)
 				,'langs' => $langs
@@ -267,10 +278,7 @@ function _get_showDifficulte($object, $selectDifficulte, $mode = 'view')
 	}
 	elseif ($mode == 'edit')
 	{
-		return $form->selectarray('difficulte'
-									, $selectDifficulte
-									, $object->difficulte
-								);
+		return $form->selectarray('difficulte', $selectDifficulte, $object->difficulte);
 	}
 	return '';
 }

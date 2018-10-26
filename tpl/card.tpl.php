@@ -1,6 +1,6 @@
 <!-- Un début de <div> existe de par la fonction dol_fiche_head() -->
 	<input type="hidden" name="action" value="[view.action]" />
-	
+	<input type="hidden" name="saveType" value="saveWay&Rando" />
 	<table width="100%" class="border">
 		<tbody>
 			<tr class="ref">
@@ -88,6 +88,9 @@
 	[onshow;block=end]
 </div>
 
+
+
+
 <table summary="" class="centpercent notopnoleftnoright showlinkedobjectblock" style="margin-bottom: 2px;">
 	<tr>
 		<td class="nobordernopadding" valign="middle">
@@ -97,7 +100,8 @@
 </table>
 
 <form action="http://localhost/dolibarr/htdocs/custom/seedrando/card.php?id=[object.id]" method="POST">
-	<input name="action" type="hidden" value="saveContact">
+	<input name="action" type="hidden" value="save">
+	<input type="hidden" name="saveType" value="saveContact" />
 	<table class="noborder" width="100%">
 		<tbody>
 			<tr class="liste_titre">
@@ -132,6 +136,7 @@
 			[view.showListContact;strconv=no]
 	</tbody>
 </table>
+
 
 
 [onshow;block=end]
